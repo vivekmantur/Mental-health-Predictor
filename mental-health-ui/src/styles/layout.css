@@ -1,0 +1,101 @@
+/* ===== GLOBAL BACKGROUND ===== */
+.app-bg {
+  background: #eef5f3;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* ===== HEADER (NEW PROFESSIONAL STYLE) ===== */
+.header {
+  background: linear-gradient(135deg, #e0f2f1, #f0f9ff);
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.header .header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 35px 20px;
+  text-align: center;
+}
+
+.header .header-title {
+  font-size: 30px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.header .header-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  background: white;
+  border-top: 1px solid #ddd;
+  margin-top: auto;
+}
+
+.footer-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 15px;
+  text-align: center;
+  font-size: 13px;
+  color: gray;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.main-container {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* ===== CENTER MODE ===== */
+.main-container.center {
+  display: flex;
+  justify-content: center;
+}
+
+.main-container.center .form-card {
+  width: 100%;
+  max-width: 900px;
+}
+
+/* ===== SPLIT MODE ===== */
+.main-container.split {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.main-container.split .form-card,
+.main-container.split .result-card-container {
+  flex: 1;
+  min-width: 450px;
+  max-width: 700px;
+}
+
+/* ===== FORM CARD (UNCHANGED) ===== */
+.form-card {
+  background: white;
+  padding: 25px 30px;
+  border-radius: 14px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+}
+
+/* ===== RESULT CARD ===== */
+.result-card-container {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+}
