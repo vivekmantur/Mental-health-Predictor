@@ -1,70 +1,129 @@
+/* HERO */
+/* CHANGE THIS */
+.assessment-hero {
+  min-height: 100vh;   /* ✅ instead of height */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+/* OVERLAY */
+.overlay {
+  flex: 1;   /* ✅ pushes footer down */
+  width: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+/* CENTER */
+.center-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* SPLIT */
+.split-layout {
+  display: flex;
+  gap: 30px;
+  padding: 20px;
+  height: 100%;
+
+  align-items: flex-start;   /* ✅ FIX */
+}
+
+/* LEFT PANEL */
+.left-panel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
+/* RIGHT PANEL */
+.right-panel {
+  flex: 1;
+  height: 100%;
+  margin-top: 0; 
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+/* FORM CARD */
+.form-glass-card {
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  overflow-y: auto;
+
+  padding: 20px;
+
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+
+  color: white;
+}
+
+/* TITLE */
 .title {
+  text-align: center;
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 20px;
 }
 
-/* card */
-.card {
-  margin-bottom: 22px;
-}
-
-/* question */
+/* QUESTION */
 .question {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 8px;
 }
 
-/* editor container */
-.editor-container {
-  margin-top: 10px;
+/* CARD */
+.card {
+  margin-bottom: 18px;
 }
 
-/* editor box */
+/* EDITOR */
 .rsw-editor {
-  min-height: 90px;
+  min-height: 80px;
   border-radius: 10px;
-  font-size: 14px;
-  border: 1px solid #d1d5db;
-  padding: 6px;
-  transition: all 0.2s ease;
+  background: #fff !important;
+  color: #000 !important;
+  padding: 8px;
 }
 
-.rsw-editor:focus-within {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+/* INNER TEXT */
+.rsw-editor div[contenteditable="true"] {
+  color: black !important;
 }
 
-/* toolbar */
+/* TOOLBAR */
 .rsw-toolbar {
-  border-radius: 10px 10px 0 0;
-  background: #f9fafb;
-  border-bottom: 1px solid #eee;
+  background: #f3f4f6;
 }
 
-
-/* button */
+/* BUTTON */
 .button {
   width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  padding: 12px;
+  background: linear-gradient(135deg, #4f46e5, #06b6d4);
   color: white;
   border: none;
   border-radius: 10px;
-  font-size: 15px;
-  font-weight: 500;
+  margin-top: 15px;
   cursor: pointer;
-  margin-top: 20px;
-  transition: all 0.3s ease;
 }
 
-.button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.25);
+/* SCROLL */
+.form-glass-card::-webkit-scrollbar,
+.right-panel::-webkit-scrollbar {
+  width: 6px;
 }
 
-.button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.form-glass-card::-webkit-scrollbar-thumb,
+.right-panel::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.3);
+  border-radius: 10px;
 }

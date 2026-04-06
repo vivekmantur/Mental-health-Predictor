@@ -1,0 +1,53 @@
+/* ===== HEADER GLASS ===== */
+.header-glass {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  z-index: 1000;
+
+  /* 🔥 Glass effect */
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ===== CONTAINER ===== */
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+
+  padding: 12px 20px;
+}
+
+/* ===== LOGO STYLE (MATCH YOUR IMAGE) ===== */
+.logo-box {
+  background: #e5e7eb;
+  padding: 8px 18px;
+
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+
+.logo-box img {
+  height: 28px;
+  object-fit: contain;
+}
+
+/* Hover */
+.logo-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}

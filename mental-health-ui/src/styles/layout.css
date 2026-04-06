@@ -1,10 +1,9 @@
 /* ===== GLOBAL BACKGROUND ===== */
 .app-bg {
-  background: #eef5f3;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: "Segoe UI", sans-serif;
+  min-height: 100vh;
+  padding-top: 70px;
 }
 
 /* ===== HEADER (NEW PROFESSIONAL STYLE) ===== */
@@ -98,4 +97,31 @@
   padding: 25px;
   border-radius: 14px;
   box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+}
+.global-logo {
+  position: fixed;
+  top: 20px;
+  left: 25px;
+
+  height: 40px;
+  object-fit: contain;
+
+  z-index: 9999;
+  cursor: pointer;
+
+  /* ❌ REMOVE ALL THESE */
+  background: none;
+  backdrop-filter: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+
+  /* ✅ subtle blending */
+  opacity: 0.95;
+  transition: all 0.3s ease;
+}
+
+.global-logo:hover {
+  opacity: 1;
+  transform: scale(1.05);
 }

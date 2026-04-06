@@ -1,18 +1,19 @@
 import React from "react";
-import "../styles/layout.css";
+import { useNavigate } from "react-router-dom";
+import "../styles/header.css";
+import logo from "../assets/cognine.png";
 
 export default function Header() {
+  const navigate = useNavigate();
+
   return (
-    <div className="header">
-      <div className="header-inner">
+    <div className="header-glass">
+      <div className="header-container">
 
-        <h1 className="header-title">
-          🧠 Mental Health Assessment
-        </h1>
-
-        <p className="header-subtitle">
-          Understand your mental well-being using AI insights
-        </p>
+        {/* 🔥 LOGO */}
+        <div className="logo-box" onClick={() => navigate("/")}>
+          <img src={logo} alt="cognine" />
+        </div>
 
       </div>
     </div>
