@@ -1,14 +1,28 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text
+from sqlalchemy import Column, Integer, String, DateTime, Text, JSON
 from datetime import datetime
 from app.db.database import Base
-from sqlalchemy import JSON
 
+
+# ---------------------------------------------------------
+# Assessment Model
+# Represents a PHQ-9 assessment record in the database
+# ---------------------------------------------------------
 class Assessment(Base):
     __tablename__ = "assessments"
 
+    # -----------------------------------------------------
+    # Primary Identifier
+    # -----------------------------------------------------
     id = Column(Integer, primary_key=True, index=True)
+
+    # -----------------------------------------------------
+    # User Information
+    # -----------------------------------------------------
     user_id = Column(String, index=True)
 
+    # -----------------------------------------------------
+    # PHQ-9 Individual Question Scores (0–3 each)
+    # -----------------------------------------------------
     q1 = Column(Integer)
     q2 = Column(Integer)
     q3 = Column(Integer)
@@ -19,10 +33,19 @@ class Assessment(Base):
     q8 = Column(Integer)
     q9 = Column(Integer)
 
-    score = Column(Integer)
-    severity = Column(String)
+    # -----------------------------------------------------
+    # Aggregated Results
+    # -----------------------------------------------------
+    score = Column(Integer)        # Total PHQ-9 score (0–27)
+    severity = Column(String)      # Severity label (e.g., Mild, Moderate, Severe)
 
-    # ✅ ADD THIS
+    # -----------------------------------------------------
+    # Raw User Input (Free-text answers)
+    # Stored as JSON for flexibility
+    # -----------------------------------------------------
     answers_text = Column(JSON)
 
+    # -----------------------------------------------------
+    # Timestamp
+    # -----------------------------------------------------
     created_at = Column(DateTime, default=datetime.utcnow)

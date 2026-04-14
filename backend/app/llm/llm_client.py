@@ -3,11 +3,20 @@ import json
 from groq import Groq
 from dotenv import load_dotenv
 
-load_dotenv() 
+# ---------------------------------------------------------
+# Load environment variables (.env)
+# ---------------------------------------------------------
+load_dotenv()
 
+# ---------------------------------------------------------
+# Initialize Groq client using API key
+# ---------------------------------------------------------
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# The exact PHQ-9 questions provide better context for the LLM
+
+# ---------------------------------------------------------
+# PHQ-9 Questions (used for better LLM context)
+# ---------------------------------------------------------
 PHQ9_QUESTIONS = [
     "1. Little interest or pleasure in doing things",
     "2. Feeling down, depressed, or hopeless",
@@ -20,9 +29,28 @@ PHQ9_QUESTIONS = [
     "9. Thoughts that you would be better off dead, or of hurting yourself in some way"
 ]
 
+
+# ---------------------------------------------------------
+# AI-Based PHQ-9 Scoring Function
+# ---------------------------------------------------------
 def ai_score_answers(answers):
-    print("INPUT ANSWERS:", answers)  # ✅ DEBUG
-    
+    """
+    Converts free-text user answers into PHQ-9 scores (0–3)
+    using an LLM (Groq API).
+
+    Args:
+        answers (list[str]): List of 9 textual answers
+
+    Returns:
+        list[int]: Validated PHQ-9 scores
+    """
+
+    # Debug log (replace with logger in production)
+    print("INPUT ANSWERS:", answers)
+
+    # ---------------------------------------------------------
+    # Prompt Engineering: Provide structured instructions
+    # ---------------------------------------------------------
     prompt = f"""
     You are an expert clinical PHQ-9 scoring assistant. 
     A user has provided free-text descriptions of their mental health symptoms over the last 2 weeks. 
@@ -32,33 +60,15 @@ def ai_score_answers(answers):
     Your task: Assess the severity and implied frequency in each answer and assign a clinical PHQ-9 score (0-3).
 
     SCORING RUBRIC (Adapted for Free-Text):
-    0 = Normal/Absent: No signs of the symptom, healthy baseline. 
-        (e.g., "Eating habits are normal", "I sleep well", "Energy levels are good")
-    1 = Mild/Occasional: Minor disruption, happening sometimes, manageable. 
-        (e.g., "I feel a bit tired sometimes", "I occasionally skip meals")
-    2 = Moderate/Frequent: Noticeable disruption, happening often, struggling. 
-        (e.g., "I have trouble sleeping most nights", "I often feel hopeless")
-    3 = Severe/Constant: Extreme wording, happening constantly, debilitating. 
-        (e.g., "I am ALWAYS exhausted", "COMPLETELY lost my appetite", "I stay in bed all day")
+    0 = Normal/Absent
+    1 = Mild/Occasional
+    2 = Moderate/Frequent
+    3 = Severe/Constant
 
     CRITICAL RULES:
-    - Look for intensity modifiers (e.g., "always", "completely", "barely", "normal") to determine the score.
-    - If the user's answer is ambiguous or mildly negative, default to 1.
-    - Q9 is extremely critical: Any hint of self-harm, wishing to not exist, or suicidal ideation must be scored at least 1. "Normal" thoughts about death score 0 only if strictly philosophical and completely non-threatening.
-
-    --- EXAMPLES FROM REAL DATA ---
-    Q: "Trouble falling or staying asleep, or sleeping too much"
-    Answer: "I barely sleep at night, and when I do, nightmares wake me up." -> Score: 3 (Severe)
-    
-    Q: "Poor appetite or overeating"
-    Answer: "Eating habits are normal, no major appetite changes." -> Score: 0 (Normal)
-    
-    Q: "Feeling tired or having little energy"
-    Answer: "Energy levels are good, I can do my daily tasks easily." -> Score: 0 (Normal)
-    
-    Q: "Feeling tired or having little energy"
-    Answer: "I am always exhausted, even talking feels like too much effort." -> Score: 3 (Severe)
-    ----------------
+    - Use intensity modifiers (e.g., "always", "barely", "normal")
+    - If ambiguous → default to 1
+    - Q9 (self-harm) must be handled carefully
 
     QUESTIONS AND USER ANSWERS:
     1. {PHQ9_QUESTIONS[0]} | Answer: "{answers[0]}"
@@ -71,50 +81,63 @@ def ai_score_answers(answers):
     8. {PHQ9_QUESTIONS[7]} | Answer: "{answers[7]}"
     9. {PHQ9_QUESTIONS[8]} | Answer: "{answers[8]}"
 
-    You MUST return ONLY a valid JSON object. 
-    Format required: {{"scores": [score1, score2, score3, score4, score5, score6, score7, score8, score9]}}
+    Return ONLY JSON:
+    {{"scores": [s1, s2, s3, s4, s5, s6, s7, s8, s9]}}
     """
 
     try:
+        # ---------------------------------------------------------
+        # Call Groq LLM API
+        # ---------------------------------------------------------
         response = client.chat.completions.create(
-            # Switched to the best Groq reasoning model
             model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "You output ONLY valid JSON."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0,
-            # Enforce strict JSON output at the API level
-            response_format={"type": "json_object"} 
+            response_format={"type": "json_object"}  # Enforce JSON
         )
 
         raw_output = response.choices[0].message.content.strip()
 
-        print("🔴 RAW LLM OUTPUT:", raw_output)   # ✅ DEBUG
+        # Debug log
+        print("🔴 RAW LLM OUTPUT:", raw_output)
 
+        # ---------------------------------------------------------
+        # Parse and validate scores
+        # ---------------------------------------------------------
         return extract_scores(raw_output)
-    
+
     except Exception as e:
+        # Fallback in case of API failure
         print("❌ API ERROR:", str(e))
         return [0] * 9
 
 
-# ---------------------------
-# SAFE PARSER (VERY IMPORTANT)
-# ---------------------------
+# ---------------------------------------------------------
+# SAFE JSON PARSER (CRITICAL FOR RELIABILITY)
+# ---------------------------------------------------------
 def extract_scores(json_str):
     """
-    Since we enforce JSON at the API level, we only need to validate 
-    the structure and values, rather than relying on string searches.
+    Validates and extracts PHQ-9 scores from LLM JSON output.
+
+    Ensures:
+    - Correct JSON format
+    - Exactly 9 scores
+    - Values are integers in range [0–3]
     """
+
     try:
         data = json.loads(json_str)
         scores = data.get("scores", [])
 
+        # Validate structure
         if not isinstance(scores, list) or len(scores) != 9:
             print(f"❌ PARSE ERROR: Length is {len(scores)}, expected 9")
             return [0] * 9
 
+        # Validate values
         validated = []
         for s in scores:
             if isinstance(s, int) and s in [0, 1, 2, 3]:
@@ -123,22 +146,34 @@ def extract_scores(json_str):
                 print(f"⚠️ INVALID SCORE FOUND: {s}, defaulting to 0.")
                 validated.append(0)
 
-        print("🟢 PARSED SCORES:", validated)  # ✅ DEBUG
+        print("🟢 PARSED SCORES:", validated)
         return validated
 
     except json.JSONDecodeError as e:
         print("❌ JSON FORMAT ERROR:", str(e))
         return [0] * 9
+
     except Exception as e:
         print("❌ UNEXPECTED PARSE ERROR:", str(e))
         return [0] * 9
 
 
-# ---------------------------
-# KEEP YOUR EXISTING FUNCTION
-# ---------------------------
+# ---------------------------------------------------------
+# Insight Generation (LLM-based)
+# ---------------------------------------------------------
 def generate_insight(prompt: str) -> str:
-    print("PROMPT TO LLM:", prompt)  # ✅ DEBUG
+    """
+    Generates mental health insight from user input using LLM.
+
+    Args:
+        prompt (str): User input / processed context
+
+    Returns:
+        str: Insight text
+    """
+
+    print("PROMPT TO LLM:", prompt)
+
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[
