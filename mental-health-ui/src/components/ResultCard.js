@@ -90,19 +90,19 @@ export default function ResultCard({ result }) {
           <div className="chart-box">
             <ResponsiveContainer width="100%" height={260}>
               <RadarChart data={chartData}>
-                <PolarGrid stroke="#aaa" />
+                <PolarGrid stroke="#c7d8e6" />
                 <PolarAngleAxis
                   dataKey="subject"
-                  tick={{ fill: "#fff", fontSize: 12 }}
+                  tick={{ fill: "#37526d", fontSize: 12 }}
                 />
                 <PolarRadiusAxis
                   domain={[0, 3]}
-                  tick={{ fill: "#ccc" }}
+                  tick={{ fill: "#7a93ad" }}
                 />
                 <Radar
                   dataKey="value"
-                  stroke="#06b6d4"
-                  fill="#06b6d4"
+                  stroke="#1d74bf"
+                  fill="#7dc7f4"
                   fillOpacity={0.5}
                 />
               </RadarChart>
@@ -119,18 +119,26 @@ export default function ResultCard({ result }) {
                 <XAxis
                   dataKey="subject"
                   interval={0}   // ✅ SHOW ALL LABELS
-                  stroke="#fff"
-                  tick={{ fill: "#fff", fontSize: 12 }}
+                  stroke="#9eb6cc"
+                  tick={{ fill: "#37526d", fontSize: 12 }}
                 />
                 <YAxis
                   domain={[0, 3]}
-                  stroke="#fff"
-                  tick={{ fill: "#fff" }}
+                  stroke="#9eb6cc"
+                  tick={{ fill: "#7a93ad" }}
                 />
-                <Tooltip />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #d5e2ee",
+                    borderRadius: "12px",
+                    boxShadow: "0 16px 32px rgba(25, 65, 106, 0.12)",
+                    color: "#16324f"
+                  }}
+                />
                 <Bar
                   dataKey="value"
-                  fill="#4f46e5"
+                  fill="#1d74bf"
                   radius={[6, 6, 0, 0]}
                 />
               </BarChart>
@@ -188,13 +196,13 @@ export default function ResultCard({ result }) {
               {/* RADAR */}
               <ResponsiveContainer width="50%" height={400}>
                 <RadarChart data={chartData}>
-                  <PolarGrid stroke="#ccc" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: "#fff" }} />
-                  <PolarRadiusAxis domain={[0, 3]} tick={{ fill: "#fff" }} />
+                  <PolarGrid stroke="#c7d8e6" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: "#37526d" }} />
+                  <PolarRadiusAxis domain={[0, 3]} tick={{ fill: "#7a93ad" }} />
                   <Radar
                     dataKey="value"
-                    stroke="#60a5fa"
-                    fill="#60a5fa"
+                    stroke="#1d74bf"
+                    fill="#7dc7f4"
                     fillOpacity={0.6}
                   />
                 </RadarChart>
@@ -209,12 +217,20 @@ export default function ResultCard({ result }) {
                   <XAxis
                     dataKey="subject"
                     interval={0}
-                    stroke="#fff"
-                    tick={{ fill: "#fff", fontSize: 12 }}
+                    stroke="#9eb6cc"
+                    tick={{ fill: "#37526d", fontSize: 12 }}
                   />
-                  <YAxis stroke="#fff" tick={{ fill: "#fff" }} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#60a5fa" />
+                  <YAxis stroke="#9eb6cc" tick={{ fill: "#7a93ad" }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #d5e2ee",
+                      borderRadius: "12px",
+                      boxShadow: "0 16px 32px rgba(25, 65, 106, 0.12)",
+                      color: "#16324f"
+                    }}
+                  />
+                  <Bar dataKey="value" fill="#1d74bf" />
                 </BarChart>
               </ResponsiveContainer>
 

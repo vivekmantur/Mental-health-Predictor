@@ -1,21 +1,25 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/header.css";
-import logo from "../assets/cognine.png";
+import logo from "../assets/cognine-transparent.png";
 
 export default function Header() {
   const navigate = useNavigate();
 
   return (
-    <div className="header-glass">
+    <header className="header-glass">
       <div className="header-container">
-
-        {/* 🔥 LOGO */}
-        <div className="logo-box" onClick={() => navigate("/")}>
-          <img src={logo} alt="cognine" />
-        </div>
-
+        <button
+          type="button"
+          className="brand-lockup"
+          onClick={() => navigate("/")}
+          aria-label="Go to dashboard"
+        >
+          <span className="logo-stage">
+            <img src={logo} alt="Cognine" />
+          </span>
+        </button>
       </div>
-    </div>
+    </header>
   );
 }
