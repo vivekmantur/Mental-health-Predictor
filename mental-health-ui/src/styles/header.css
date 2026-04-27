@@ -32,7 +32,7 @@
 
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
 
   padding: 12px 20px;
 }
@@ -142,4 +142,69 @@
   .logo-stage img {
     height: 34px;
   }
+}
+
+
+/* LOGIN BUTTON */
+.login-btn {
+   padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #0d4a8f 0%, #2078c6 60%, #79d6ff 100%);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(8, 61, 111, 0.25);
+  transition: all 0.25s ease;
+}
+
+.login-btn:hover {
+  background: rgba(125, 199, 244, 0.2);
+  transform: translateY(-1px);
+}
+
+/* REGISTER BUTTON */
+.register-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #0d4a8f 0%, #2078c6 60%, #79d6ff 100%);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(8, 61, 111, 0.25);
+  transition: all 0.25s ease;
+}
+
+.register-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(8, 61, 111, 0.35);
+}
+
+
+
+
+.logout-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(255, 0, 0, 0.3);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-email {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.logout-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  cursor: pointer;
 }

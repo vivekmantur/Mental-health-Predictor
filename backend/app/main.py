@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.v1.endpoints import auth
+
+
 
 # API Routes
 from app.api.v1.endpoints import phq9
@@ -9,17 +12,19 @@ from app.db.database import engine, Base
 
 # Models (IMPORTANT: ensures table creation)
 from app.models.assessment import Assessment
-
+from app.api.v1.endpoints import doctor
 
 # ---------------------------------------------------------
 # Initialize FastAPI Application
 # ---------------------------------------------------------
 app = FastAPI(title="AI Mental Health Platform")
-
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Auth"])
+app.include_router(phq9.router, prefix="/api/v1/phq9", tags=["PHQ9"])
+app.include_router(doctor.router, prefix="/api/v1/doctor", tags=["Doctor"])
 
 # ---------------------------------------------------------
 # CORS Middleware Configuration
-# يسمح للـ frontend بالتواصل مع الـ backend
+
 # ---------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,

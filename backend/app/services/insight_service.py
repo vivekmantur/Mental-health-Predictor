@@ -1,42 +1,63 @@
-from app.llm.llm_client import generate_insight as llm_call
+from app.llm.llm_client import client
 
 
-# ---------------------------------------------------------
-# Insight Generation Service
-# ---------------------------------------------------------
-def generate_insight(answers, severity):
-    """
-    Generates a concise mental health insight based on:
-    - User's free-text responses
-    - Computed severity level
-
-    Args:
-        answers (list[str]): User's PHQ-9 textual responses
-        severity (str): Calculated severity level
-
-    Returns:
-        str: AI-generated emotional insight
-    """
-
-    # -----------------------------------------------------
-    # Prompt construction for LLM
-    # -----------------------------------------------------
+def generate_insight(context: str, severity: str) -> str:
     prompt = f"""
-        You are a mental health assistant.
+    You are a mental health assistant.
 
-        User responses:
-        {answers}
+    Based on the PHQ-9 result below:
 
-        Severity: {severity}
+    {context}
 
-        Give:
-        - Emotional summary
-        - Key struggles
+    Write a short, empathetic paragraph (3-4 lines).
+    Be specific and helpful.
 
-        Keep it short, empathetic, human-like.
-        """
+    IMPORTANT:
+    - Do NOT return empty response
+    - Always give meaningful output
+    """
 
-    # -----------------------------------------------------
-    # Call LLM client and return generated insight
-    # -----------------------------------------------------
-    return llm_call(prompt)
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You must always respond with helpful content."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5
+        )
+
+        output = response.choices[0].message.content.strip()
+
+        return output if output else "You may be experiencing some emotional strain. It's important to take care of your mental well-being."
+
+    except Exception as e:
+        print("❌ INSIGHT ERROR:", str(e))
+        return "Unable to generate insight."
+    prompt = f"""
+    You are a mental health assistant.
+
+    Based on the PHQ-9 assessment:
+
+    {context}
+
+    Provide:
+    - A short, empathetic insight (3–4 lines)
+    - Do NOT sound robotic
+    """
+
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You are a helpful mental health assistant."},
+                {"role": "user", "content": prompt}
+            ], 
+            temperature=0.4
+        )
+
+        return response.choices[0].message.content.strip()
+
+    except Exception as e:
+        print("❌ INSIGHT ERROR:", str(e))
+        return "Unable to generate insight at the moment."

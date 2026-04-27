@@ -1,0 +1,998 @@
+{
+  "meta": {
+    "title": "DSM-5 Knowledge Base — Assessment Note Matching",
+    "edition": "DSM-5 (Fifth Edition)",
+    "publisher": "American Psychiatric Association",
+    "year": 2013,
+    "purpose": "Maps user-entered free-text notes (e.g. from PHQ-9 Additional Notes field) to DSM-5 disorders. Each entry has an id, category (DSM-5 section), subcategory (sub-group), disorder name, and text keywords for NLP matching.",
+    "fields": {
+      "id": "Unique identifier for each disorder entry (use for DB indexing and lookup)",
+      "category": "Top-level DSM-5 chapter name",
+      "category_id": "Numeric ID of the DSM-5 chapter (1–22)",
+      "subcategory": "Sub-group within a chapter (e.g. 'Tic Disorders' inside Neurodevelopmental)",
+      "disorder": "Official DSM-5 disorder name",
+      "icd10": "ICD-10-CM billing code — use for clinical records, EHR export, or insurance integration",
+      "icd9": "ICD-9-CM legacy code — kept for backward compatibility with older systems",
+      "keywords": "Natural language terms a patient or clinician might type in a free-text notes field. Used for fuzzy/semantic text matching.",
+      "specifiers": "Subtypes or severity levels under this disorder (optional)"
+    }
+  },
+  "disorders": [
+    {
+      "id": "ND-001",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Intellectual Disabilities",
+      "disorder": "Intellectual Disability (Intellectual Developmental Disorder)",
+      "icd10": "F70-F73",
+      "icd9": "317-318.2",
+      "specifiers": ["Mild", "Moderate", "Severe", "Profound"],
+      "keywords": ["intellectual disability", "mental retardation", "low IQ", "developmental disorder", "cognitive impairment", "learning difficulty", "adaptive functioning", "intellectual developmental disorder", "slow learner", "intellectual impairment"]
+    },
+    {
+      "id": "ND-002",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Intellectual Disabilities",
+      "disorder": "Global Developmental Delay",
+      "icd10": "F88",
+      "icd9": "315.8",
+      "keywords": ["global delay", "developmental delay", "delayed milestones", "not meeting milestones", "slow development", "developmental lag", "delayed child"]
+    },
+    {
+      "id": "ND-003",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Intellectual Disabilities",
+      "disorder": "Unspecified Intellectual Disability",
+      "icd10": "F79",
+      "icd9": "319",
+      "keywords": ["unspecified intellectual disability", "intellectual disability not specified", "untested intellectual impairment"]
+    },
+    {
+      "id": "ND-004",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Communication Disorders",
+      "disorder": "Language Disorder",
+      "icd10": "F80.2",
+      "icd9": "315.32",
+      "keywords": ["language disorder", "trouble speaking", "difficulty with words", "language delay", "poor vocabulary", "can't express thoughts", "language impairment", "speech delay", "trouble understanding language"]
+    },
+    {
+      "id": "ND-005",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Communication Disorders",
+      "disorder": "Speech Sound Disorder",
+      "icd10": "F80.0",
+      "icd9": "315.39",
+      "keywords": ["speech sound disorder", "articulation disorder", "pronunciation problems", "mispronunciation", "unclear speech", "speech errors", "phonological disorder"]
+    },
+    {
+      "id": "ND-006",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Communication Disorders",
+      "disorder": "Childhood-Onset Fluency Disorder (Stuttering)",
+      "icd10": "F80.81",
+      "icd9": "315.35",
+      "keywords": ["stuttering", "stammering", "fluency disorder", "repeating words", "blocking speech", "speech repetition", "can't speak smoothly", "halting speech"]
+    },
+    {
+      "id": "ND-007",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Communication Disorders",
+      "disorder": "Social (Pragmatic) Communication Disorder",
+      "icd10": "F80.89",
+      "icd9": "315.39",
+      "keywords": ["social communication disorder", "pragmatic language disorder", "trouble reading social cues", "difficulty in conversations", "misunderstanding social context", "awkward communication", "poor conversational skills"]
+    },
+    {
+      "id": "ND-008",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Autism Spectrum Disorder",
+      "disorder": "Autism Spectrum Disorder",
+      "icd10": "F84.0",
+      "icd9": "299.00",
+      "specifiers": ["Requiring very substantial support", "Requiring substantial support", "Requiring support"],
+      "keywords": ["autism", "autism spectrum", "ASD", "Asperger", "social interaction difficulty", "repetitive behavior", "restricted interests", "sensory sensitivity", "nonverbal communication difficulty", "routine rigidity", "eye contact avoidance", "stimming", "meltdowns"]
+    },
+    {
+      "id": "ND-009",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Attention-Deficit/Hyperactivity Disorder",
+      "disorder": "ADHD - Combined Presentation",
+      "icd10": "F90.2",
+      "icd9": "314.01",
+      "keywords": ["ADHD combined", "attention deficit hyperactivity", "inattentive and hyperactive", "can't focus and hyperactive", "distracted and impulsive", "ADD and ADHD"]
+    },
+    {
+      "id": "ND-010",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Attention-Deficit/Hyperactivity Disorder",
+      "disorder": "ADHD - Predominantly Inattentive Presentation",
+      "icd10": "F90.0",
+      "icd9": "314.00",
+      "keywords": ["ADHD inattentive", "ADD", "can't concentrate", "easily distracted", "forgetful", "trouble focusing", "losing things", "daydreaming", "poor attention", "not listening", "disorganized", "inattention"]
+    },
+    {
+      "id": "ND-011",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Attention-Deficit/Hyperactivity Disorder",
+      "disorder": "ADHD - Predominantly Hyperactive/Impulsive Presentation",
+      "icd10": "F90.1",
+      "icd9": "314.01",
+      "keywords": ["hyperactive", "impulsive", "can't sit still", "fidgeting", "interrupting", "talking too much", "restless", "impulsivity", "acting without thinking", "hyperactivity"]
+    },
+    {
+      "id": "ND-012",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Specific Learning Disorder",
+      "disorder": "Specific Learning Disorder - With Impairment in Reading",
+      "icd10": "F81.0",
+      "icd9": "315.00",
+      "keywords": ["dyslexia", "reading difficulty", "trouble reading", "reading disorder", "can't read well", "word reading problems", "slow reader", "reading comprehension issues", "reading fluency"]
+    },
+    {
+      "id": "ND-013",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Specific Learning Disorder",
+      "disorder": "Specific Learning Disorder - With Impairment in Written Expression",
+      "icd10": "F81.81",
+      "icd9": "315.2",
+      "keywords": ["dysgraphia", "writing difficulty", "trouble writing", "spelling problems", "grammar issues", "poor handwriting", "can't write clearly", "written expression disorder"]
+    },
+    {
+      "id": "ND-014",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Specific Learning Disorder",
+      "disorder": "Specific Learning Disorder - With Impairment in Mathematics",
+      "icd10": "F81.2",
+      "icd9": "315.1",
+      "keywords": ["dyscalculia", "math difficulty", "trouble with numbers", "can't do math", "arithmetic problems", "number sense issues", "math disorder", "calculation difficulty"]
+    },
+    {
+      "id": "ND-015",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Motor Disorders",
+      "disorder": "Developmental Coordination Disorder",
+      "icd10": "F82",
+      "icd9": "315.4",
+      "keywords": ["clumsy", "poor coordination", "motor skills delay", "dyspraxia", "balance problems", "coordination disorder", "trouble with fine motor skills", "dropping things", "difficulty with sports"]
+    },
+    {
+      "id": "ND-016",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Motor Disorders",
+      "disorder": "Stereotypic Movement Disorder",
+      "icd10": "F98.4",
+      "icd9": "307.3",
+      "keywords": ["repetitive movements", "hand flapping", "body rocking", "head banging", "self-biting", "stereotypy", "purposeless movements", "motor stereotypies"]
+    },
+    {
+      "id": "ND-017",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Tic Disorders",
+      "disorder": "Tourette's Disorder",
+      "icd10": "F95.2",
+      "icd9": "307.23",
+      "keywords": ["Tourette", "tics", "vocal tics", "motor tics", "involuntary sounds", "involuntary movements", "coprolalia", "tic disorder", "twitching", "blinking tic"]
+    },
+    {
+      "id": "ND-018",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Tic Disorders",
+      "disorder": "Persistent (Chronic) Motor or Vocal Tic Disorder",
+      "icd10": "F95.1",
+      "icd9": "307.22",
+      "keywords": ["chronic tic", "persistent tic", "motor tic", "vocal tic", "long term tics", "chronic twitching", "repetitive sounds"]
+    },
+    {
+      "id": "ND-019",
+      "category_id": 1,
+      "category": "Neurodevelopmental Disorders",
+      "subcategory": "Tic Disorders",
+      "disorder": "Provisional Tic Disorder",
+      "icd10": "F95.0",
+      "icd9": "307.21",
+      "keywords": ["new tic", "recent tic", "temporary tic", "tic less than a year", "short-term tic"]
+    },
+    {
+      "id": "SP-001",
+      "category_id": 2,
+      "category": "Schizophrenia Spectrum and Other Psychotic Disorders",
+      "subcategory": "Psychotic Disorders",
+      "disorder": "Schizotypal (Personality) Disorder",
+      "icd10": "F21",
+      "icd9": "301.22",
+      "keywords": ["odd beliefs", "magical thinking", "unusual perceptions", "eccentric behavior", "social isolation", "paranoid ideas", "strange speech", "schizotypal"]
+    },
+    {
+      "id": "SP-002",
+      "category_id": 2,
+      "category": "Schizophrenia Spectrum and Other Psychotic Disorders",
+      "subcategory": "Psychotic Disorders",
+      "disorder": "Delusional Disorder",
+      "icd10": "F22",
+      "icd9": "297.1",
+      "keywords": ["delusions", "false beliefs", "paranoid", "thinks people are following them", "believes they're being persecuted", "grandiose delusions", "jealous delusions", "somatic delusions", "erotomania"]
+    },
+    {
+      "id": "SP-003",
+      "category_id": 2,
+      "category": "Schizophrenia Spectrum and Other Psychotic Disorders",
+      "subcategory": "Psychotic Disorders",
+      "disorder": "Brief Psychotic Disorder",
+      "icd10": "F23",
+      "icd9": "298.8",
+      "keywords": ["brief psychosis", "sudden psychosis", "hallucinations brief", "psychotic episode", "temporary psychosis", "postpartum psychosis"]
+    },
+    {
+      "id": "SP-004",
+      "category_id": 2,
+      "category": "Schizophrenia Spectrum and Other Psychotic Disorders",
+      "subcategory": "Psychotic Disorders",
+      "disorder": "Schizophrenia",
+      "icd10": "F20.9",
+      "icd9": "295.90",
+      "keywords": ["schizophrenia", "hallucinations", "hearing voices", "seeing things", "delusions", "disorganized thinking", "flat affect", "negative symptoms", "psychosis", "thought disorder", "catatonia"]
+    },
+    {
+      "id": "SP-005",
+      "category_id": 2,
+      "category": "Schizophrenia Spectrum and Other Psychotic Disorders",
+      "subcategory": "Psychotic Disorders",
+      "disorder": "Schizoaffective Disorder - Bipolar Type",
+      "icd10": "F25.0",
+      "icd9": "295.70",
+      "keywords": ["schizoaffective bipolar", "psychosis and mania", "hallucinations and mood swings", "schizophrenia and bipolar"]
+    },
+    {
+      "id": "SP-006",
+      "category_id": 2,
+      "category": "Schizophrenia Spectrum and Other Psychotic Disorders",
+      "subcategory": "Psychotic Disorders",
+      "disorder": "Schizoaffective Disorder - Depressive Type",
+      "icd10": "F25.1",
+      "icd9": "295.70",
+      "keywords": ["schizoaffective depressive", "psychosis and depression", "hallucinations and sadness", "schizophrenia and depression"]
+    },
+    {
+      "id": "BP-001",
+      "category_id": 3,
+      "category": "Bipolar and Related Disorders",
+      "subcategory": "Bipolar Disorders",
+      "disorder": "Bipolar I Disorder",
+      "icd10": "F31.x",
+      "icd9": "296.4x-296.7",
+      "specifiers": ["Manic episode", "Hypomanic episode", "Depressed episode"],
+      "keywords": ["bipolar I", "bipolar 1", "mania", "manic episode", "extreme mood swings", "euphoria then depression", "grandiosity", "no sleep needed", "racing thoughts", "reckless behavior", "bipolar disorder"]
+    },
+    {
+      "id": "BP-002",
+      "category_id": 3,
+      "category": "Bipolar and Related Disorders",
+      "subcategory": "Bipolar Disorders",
+      "disorder": "Bipolar II Disorder",
+      "icd10": "F31.81",
+      "icd9": "296.89",
+      "keywords": ["bipolar II", "bipolar 2", "hypomania", "hypomanic episodes", "mild mania", "depression with hypomania", "elevated mood and depression"]
+    },
+    {
+      "id": "BP-003",
+      "category_id": 3,
+      "category": "Bipolar and Related Disorders",
+      "subcategory": "Bipolar Disorders",
+      "disorder": "Cyclothymic Disorder",
+      "icd10": "F34.0",
+      "icd9": "301.13",
+      "keywords": ["cyclothymia", "mood instability", "mild mood swings", "up and down mood", "chronic mood fluctuations", "cyclothymic disorder"]
+    },
+    {
+      "id": "DEP-001",
+      "category_id": 4,
+      "category": "Depressive Disorders",
+      "subcategory": "Depressive Disorders",
+      "disorder": "Disruptive Mood Dysregulation Disorder",
+      "icd10": "F34.8",
+      "icd9": "296.99",
+      "keywords": ["DMDD", "irritability in children", "explosive outbursts", "severe temper", "chronic irritability", "temper tantrums", "mood dysregulation child"]
+    },
+    {
+      "id": "DEP-002",
+      "category_id": 4,
+      "category": "Depressive Disorders",
+      "subcategory": "Depressive Disorders",
+      "disorder": "Major Depressive Disorder - Single Episode",
+      "icd10": "F32.x",
+      "icd9": "296.2x",
+      "keywords": ["major depression", "MDD", "depressed mood", "feeling hopeless", "feeling worthless", "no interest", "sad all the time", "crying", "loss of pleasure", "anhedonia", "suicidal thoughts", "single depressive episode", "low energy", "can't sleep", "sleeping too much", "not eating", "overeating", "can't concentrate", "depressed"]
+    },
+    {
+      "id": "DEP-003",
+      "category_id": 4,
+      "category": "Depressive Disorders",
+      "subcategory": "Depressive Disorders",
+      "disorder": "Major Depressive Disorder - Recurrent Episode",
+      "icd10": "F33.x",
+      "icd9": "296.3x",
+      "keywords": ["recurrent depression", "depression comes back", "multiple depressive episodes", "chronic depression", "recurring sadness", "depression relapse"]
+    },
+    {
+      "id": "DEP-004",
+      "category_id": 4,
+      "category": "Depressive Disorders",
+      "subcategory": "Depressive Disorders",
+      "disorder": "Persistent Depressive Disorder (Dysthymia)",
+      "icd10": "F34.1",
+      "icd9": "300.4",
+      "keywords": ["dysthymia", "persistent depression", "chronic low mood", "always sad", "long-term depression", "mild chronic depression", "persistent depressive disorder", "years of sadness", "never happy", "low mood for years"]
+    },
+    {
+      "id": "DEP-005",
+      "category_id": 4,
+      "category": "Depressive Disorders",
+      "subcategory": "Depressive Disorders",
+      "disorder": "Premenstrual Dysphoric Disorder",
+      "icd10": "N94.3",
+      "icd9": "625.4",
+      "keywords": ["PMDD", "premenstrual dysphoria", "mood before period", "PMS severe", "depression before period", "irritability before period", "hormonal mood swings"]
+    },
+    {
+      "id": "ANX-001",
+      "category_id": 5,
+      "category": "Anxiety Disorders",
+      "subcategory": "Anxiety Disorders",
+      "disorder": "Separation Anxiety Disorder",
+      "icd10": "F93.0",
+      "icd9": "309.21",
+      "keywords": ["separation anxiety", "fear of being alone", "scared when parents leave", "clingy", "can't leave home", "worried about losing loved ones", "separation fear"]
+    },
+    {
+      "id": "ANX-002",
+      "category_id": 5,
+      "category": "Anxiety Disorders",
+      "subcategory": "Anxiety Disorders",
+      "disorder": "Selective Mutism",
+      "icd10": "F94.0",
+      "icd9": "313.23",
+      "keywords": ["selective mutism", "won't speak in public", "silent at school", "refuses to talk", "speaks only at home", "social mutism"]
+    },
+    {
+      "id": "ANX-003",
+      "category_id": 5,
+      "category": "Anxiety Disorders",
+      "subcategory": "Anxiety Disorders",
+      "disorder": "Specific Phobia",
+      "icd10": "F40.x",
+      "icd9": "300.29",
+      "specifiers": ["Animal", "Natural environment", "Blood-injection-injury", "Situational", "Other"],
+      "keywords": ["phobia", "fear of spiders", "fear of heights", "fear of blood", "fear of flying", "irrational fear", "specific phobia", "phobic avoidance", "fear of needles", "fear of animals", "claustrophobia", "acrophobia"]
+    },
+    {
+      "id": "ANX-004",
+      "category_id": 5,
+      "category": "Anxiety Disorders",
+      "subcategory": "Anxiety Disorders",
+      "disorder": "Social Anxiety Disorder (Social Phobia)",
+      "icd10": "F40.10",
+      "icd9": "300.23",
+      "keywords": ["social anxiety", "social phobia", "fear of judgment", "embarrassed in public", "shy", "afraid to speak up", "fear of humiliation", "avoiding social situations", "blushing", "public speaking fear", "performance anxiety"]
+    },
+    {
+      "id": "ANX-005",
+      "category_id": 5,
+      "category": "Anxiety Disorders",
+      "subcategory": "Anxiety Disorders",
+      "disorder": "Panic Disorder",
+      "icd10": "F41.0",
+      "icd9": "300.01",
+      "keywords": ["panic attacks", "panic disorder", "heart racing", "can't breathe", "chest tightness", "sudden fear", "feeling like dying", "derealization during panic", "fear of panic attacks", "palpitations", "trembling", "shortness of breath"]
+    },
+    {
+      "id": "ANX-006",
+      "category_id": 5,
+      "category": "Anxiety Disorders",
+      "subcategory": "Anxiety Disorders",
+      "disorder": "Agoraphobia",
+      "icd10": "F40.00",
+      "icd9": "300.22",
+      "keywords": ["agoraphobia", "fear of open spaces", "afraid to leave home", "fear of crowds", "can't use public transport", "fear of being outside", "avoidance of public places"]
+    },
+    {
+      "id": "ANX-007",
+      "category_id": 5,
+      "category": "Anxiety Disorders",
+      "subcategory": "Anxiety Disorders",
+      "disorder": "Generalized Anxiety Disorder",
+      "icd10": "F41.1",
+      "icd9": "300.02",
+      "keywords": ["GAD", "generalized anxiety", "constant worry", "anxious all the time", "can't stop worrying", "excessive worry", "nervous", "tense", "muscle tension", "restless", "irritable from anxiety", "worry about everything", "anxiety disorder"]
+    },
+    {
+      "id": "OCD-001",
+      "category_id": 6,
+      "category": "Obsessive-Compulsive and Related Disorders",
+      "subcategory": "OCD-Spectrum Disorders",
+      "disorder": "Obsessive-Compulsive Disorder",
+      "icd10": "F42",
+      "icd9": "300.3",
+      "keywords": ["OCD", "obsessive compulsive", "intrusive thoughts", "compulsions", "rituals", "checking", "washing hands repeatedly", "counting", "symmetry obsession", "can't stop thinking", "repetitive behaviors", "obsessions"]
+    },
+    {
+      "id": "OCD-002",
+      "category_id": 6,
+      "category": "Obsessive-Compulsive and Related Disorders",
+      "subcategory": "OCD-Spectrum Disorders",
+      "disorder": "Body Dysmorphic Disorder",
+      "icd10": "F45.22",
+      "icd9": "300.7",
+      "keywords": ["BDD", "body dysmorphia", "obsessed with appearance", "thinks they're ugly", "checking mirror constantly", "skin picking from BDD", "hate body image", "perceived flaw", "cosmetic surgery obsession"]
+    },
+    {
+      "id": "OCD-003",
+      "category_id": 6,
+      "category": "Obsessive-Compulsive and Related Disorders",
+      "subcategory": "OCD-Spectrum Disorders",
+      "disorder": "Hoarding Disorder",
+      "icd10": "F42",
+      "icd9": "300.3",
+      "keywords": ["hoarding", "can't throw things away", "cluttered home", "collecting too much", "difficulty discarding", "hoarding disorder", "excessive acquiring", "house full of stuff"]
+    },
+    {
+      "id": "OCD-004",
+      "category_id": 6,
+      "category": "Obsessive-Compulsive and Related Disorders",
+      "subcategory": "OCD-Spectrum Disorders",
+      "disorder": "Trichotillomania (Hair-Pulling Disorder)",
+      "icd10": "F63.3",
+      "icd9": "312.39",
+      "keywords": ["trichotillomania", "hair pulling", "pulling out hair", "hair loss from pulling", "compulsive hair pulling", "bald patches from pulling"]
+    },
+    {
+      "id": "OCD-005",
+      "category_id": 6,
+      "category": "Obsessive-Compulsive and Related Disorders",
+      "subcategory": "OCD-Spectrum Disorders",
+      "disorder": "Excoriation (Skin-Picking) Disorder",
+      "icd10": "L98.1",
+      "icd9": "698.4",
+      "keywords": ["skin picking", "excoriation", "picking at skin", "compulsive skin picking", "picking scabs", "picking pimples compulsively", "dermatillomania"]
+    },
+    {
+      "id": "TRA-001",
+      "category_id": 7,
+      "category": "Trauma- and Stressor-Related Disorders",
+      "subcategory": "Trauma Disorders",
+      "disorder": "Reactive Attachment Disorder",
+      "icd10": "F94.1",
+      "icd9": "313.89",
+      "keywords": ["reactive attachment", "RAD", "doesn't bond", "emotionally withdrawn child", "neglected child", "no attachment", "emotionally flat child"]
+    },
+    {
+      "id": "TRA-002",
+      "category_id": 7,
+      "category": "Trauma- and Stressor-Related Disorders",
+      "subcategory": "Trauma Disorders",
+      "disorder": "Posttraumatic Stress Disorder (PTSD)",
+      "icd10": "F43.10",
+      "icd9": "309.81",
+      "keywords": ["PTSD", "post traumatic stress", "trauma", "flashbacks", "nightmares from trauma", "avoidance", "hypervigilance", "startle response", "reliving trauma", "emotional numbing", "traumatic event", "combat trauma", "sexual assault trauma", "abuse trauma", "survivor guilt"]
+    },
+    {
+      "id": "TRA-003",
+      "category_id": 7,
+      "category": "Trauma- and Stressor-Related Disorders",
+      "subcategory": "Trauma Disorders",
+      "disorder": "Acute Stress Disorder",
+      "icd10": "F43.0",
+      "icd9": "308.3",
+      "keywords": ["acute stress", "stress after trauma", "shock response", "dissociation after trauma", "acute trauma reaction", "recent traumatic event", "short term PTSD"]
+    },
+    {
+      "id": "TRA-004",
+      "category_id": 7,
+      "category": "Trauma- and Stressor-Related Disorders",
+      "subcategory": "Adjustment Disorders",
+      "disorder": "Adjustment Disorder with Depressed Mood",
+      "icd10": "F43.21",
+      "icd9": "309.0",
+      "keywords": ["adjustment disorder depression", "sad after life change", "depressed after divorce", "depressed after loss", "grief", "coping with change", "difficulty adjusting", "bereavement related depression"]
+    },
+    {
+      "id": "TRA-005",
+      "category_id": 7,
+      "category": "Trauma- and Stressor-Related Disorders",
+      "subcategory": "Adjustment Disorders",
+      "disorder": "Adjustment Disorder with Anxiety",
+      "icd10": "F43.22",
+      "icd9": "309.24",
+      "keywords": ["adjustment anxiety", "anxious after life change", "stressed by new situation", "anxiety from moving", "anxiety from job loss", "stress adjustment"]
+    },
+    {
+      "id": "TRA-006",
+      "category_id": 7,
+      "category": "Trauma- and Stressor-Related Disorders",
+      "subcategory": "Adjustment Disorders",
+      "disorder": "Adjustment Disorder with Mixed Anxiety and Depressed Mood",
+      "icd10": "F43.23",
+      "icd9": "309.28",
+      "keywords": ["adjustment mixed", "anxious and sad after change", "stress causing anxiety and depression", "mixed adjustment reaction"]
+    },
+    {
+      "id": "DIS-001",
+      "category_id": 8,
+      "category": "Dissociative Disorders",
+      "subcategory": "Dissociative Disorders",
+      "disorder": "Dissociative Identity Disorder",
+      "icd10": "F44.81",
+      "icd9": "300.14",
+      "keywords": ["DID", "multiple personalities", "dissociative identity", "alter personalities", "identity fragmentation", "switching personalities", "amnesia between identities"]
+    },
+    {
+      "id": "DIS-002",
+      "category_id": 8,
+      "category": "Dissociative Disorders",
+      "subcategory": "Dissociative Disorders",
+      "disorder": "Dissociative Amnesia",
+      "icd10": "F44.0",
+      "icd9": "300.12",
+      "keywords": ["dissociative amnesia", "memory loss from trauma", "can't remember traumatic event", "blocked memories", "psychogenic amnesia", "forgetting who you are"]
+    },
+    {
+      "id": "DIS-003",
+      "category_id": 8,
+      "category": "Dissociative Disorders",
+      "subcategory": "Dissociative Disorders",
+      "disorder": "Depersonalization/Derealization Disorder",
+      "icd10": "F48.1",
+      "icd9": "300.6",
+      "keywords": ["depersonalization", "derealization", "feeling unreal", "outside of body", "world feels unreal", "detachment from self", "watching yourself", "robotic feeling", "foggy sense of reality"]
+    },
+    {
+      "id": "SOM-001",
+      "category_id": 9,
+      "category": "Somatic Symptom and Related Disorders",
+      "subcategory": "Somatic Disorders",
+      "disorder": "Somatic Symptom Disorder",
+      "icd10": "F45.1",
+      "icd9": "300.82",
+      "keywords": ["somatic symptom", "physical symptoms from stress", "unexplained medical symptoms", "somatization", "multiple physical complaints", "bodily distress", "excessive worry about illness symptoms"]
+    },
+    {
+      "id": "SOM-002",
+      "category_id": 9,
+      "category": "Somatic Symptom and Related Disorders",
+      "subcategory": "Somatic Disorders",
+      "disorder": "Illness Anxiety Disorder",
+      "icd10": "F45.21",
+      "icd9": "300.7",
+      "keywords": ["illness anxiety", "hypochondria", "hypochondriasis", "health anxiety", "fear of being sick", "constantly checking for illness", "worried about having cancer", "health preoccupation", "medical reassurance seeking"]
+    },
+    {
+      "id": "SOM-003",
+      "category_id": 9,
+      "category": "Somatic Symptom and Related Disorders",
+      "subcategory": "Somatic Disorders",
+      "disorder": "Conversion Disorder (Functional Neurological Symptom Disorder)",
+      "icd10": "F44.x",
+      "icd9": "300.11",
+      "specifiers": ["Weakness/paralysis", "Abnormal movement", "Seizures", "Speech symptom", "Sensory loss"],
+      "keywords": ["conversion disorder", "functional neurological", "paralysis no medical cause", "seizures without epilepsy", "blindness without cause", "psychogenic symptoms", "unexplained neurological symptoms", "non-epileptic seizures"]
+    },
+    {
+      "id": "EAT-001",
+      "category_id": 10,
+      "category": "Feeding and Eating Disorders",
+      "subcategory": "Eating Disorders",
+      "disorder": "Anorexia Nervosa - Restricting Type",
+      "icd10": "F50.01",
+      "icd9": "307.1",
+      "keywords": ["anorexia", "not eating", "restricting food", "fear of gaining weight", "very low weight", "starvation", "calorie restriction", "body dysmorphia eating", "thin but thinks fat"]
+    },
+    {
+      "id": "EAT-002",
+      "category_id": 10,
+      "category": "Feeding and Eating Disorders",
+      "subcategory": "Eating Disorders",
+      "disorder": "Anorexia Nervosa - Binge-Eating/Purging Type",
+      "icd10": "F50.02",
+      "icd9": "307.1",
+      "keywords": ["anorexia purging", "binge and restrict", "purge after eating", "anorexia with vomiting", "anorexia binge purge subtype"]
+    },
+    {
+      "id": "EAT-003",
+      "category_id": 10,
+      "category": "Feeding and Eating Disorders",
+      "subcategory": "Eating Disorders",
+      "disorder": "Bulimia Nervosa",
+      "icd10": "F50.2",
+      "icd9": "307.51",
+      "keywords": ["bulimia", "binge eating and purging", "vomiting after eating", "laxative abuse", "binge purge cycle", "bulimic", "self-induced vomiting", "eating large amounts then purging"]
+    },
+    {
+      "id": "EAT-004",
+      "category_id": 10,
+      "category": "Feeding and Eating Disorders",
+      "subcategory": "Eating Disorders",
+      "disorder": "Binge-Eating Disorder",
+      "icd10": "F50.8",
+      "icd9": "307.51",
+      "keywords": ["binge eating", "eating large amounts", "loss of control eating", "emotional eating", "eating disorder without purging", "overeating", "binge eating disorder", "compulsive overeating"]
+    },
+    {
+      "id": "EAT-005",
+      "category_id": 10,
+      "category": "Feeding and Eating Disorders",
+      "subcategory": "Eating Disorders",
+      "disorder": "Avoidant/Restrictive Food Intake Disorder",
+      "icd10": "F50.8",
+      "icd9": "307.59",
+      "keywords": ["ARFID", "picky eating", "food avoidance", "restricted diet", "fear of choking", "sensory food aversion", "not eating enough", "limited food intake not due to body image"]
+    },
+    {
+      "id": "SLP-001",
+      "category_id": 12,
+      "category": "Sleep-Wake Disorders",
+      "subcategory": "Insomnia and Hypersomnolence",
+      "disorder": "Insomnia Disorder",
+      "icd10": "F51.01",
+      "icd9": "307.42",
+      "keywords": ["insomnia", "can't sleep", "trouble falling asleep", "waking up at night", "early morning waking", "poor sleep quality", "sleep disorder", "not sleeping well", "sleeplessness"]
+    },
+    {
+      "id": "SLP-002",
+      "category_id": 12,
+      "category": "Sleep-Wake Disorders",
+      "subcategory": "Insomnia and Hypersomnolence",
+      "disorder": "Hypersomnolence Disorder",
+      "icd10": "F51.11",
+      "icd9": "307.44",
+      "keywords": ["hypersomnia", "sleeping too much", "excessive daytime sleepiness", "can't stay awake", "drowsy all day", "oversleeping", "hypersomnolence"]
+    },
+    {
+      "id": "SLP-003",
+      "category_id": 12,
+      "category": "Sleep-Wake Disorders",
+      "subcategory": "Insomnia and Hypersomnolence",
+      "disorder": "Narcolepsy",
+      "icd10": "G47.4x",
+      "icd9": "347.x",
+      "keywords": ["narcolepsy", "falling asleep suddenly", "sleep attacks", "cataplexy", "sudden muscle weakness", "sleep paralysis", "excessive sleep", "daytime sleep attacks"]
+    },
+    {
+      "id": "SLP-004",
+      "category_id": 12,
+      "category": "Sleep-Wake Disorders",
+      "subcategory": "Breathing-Related Sleep Disorders",
+      "disorder": "Obstructive Sleep Apnea Hypopnea",
+      "icd10": "G47.33",
+      "icd9": "327.23",
+      "keywords": ["sleep apnea", "snoring", "stops breathing in sleep", "obstructive sleep apnea", "CPAP", "waking up gasping", "daytime fatigue from sleep apnea"]
+    },
+    {
+      "id": "SLP-005",
+      "category_id": 12,
+      "category": "Sleep-Wake Disorders",
+      "subcategory": "Parasomnias",
+      "disorder": "Non-REM Sleep Arousal Disorder - Sleepwalking Type",
+      "icd10": "F51.3",
+      "icd9": "307.46",
+      "keywords": ["sleepwalking", "somnambulism", "walks in sleep", "wanders at night", "acts out during sleep"]
+    },
+    {
+      "id": "SLP-006",
+      "category_id": 12,
+      "category": "Sleep-Wake Disorders",
+      "subcategory": "Parasomnias",
+      "disorder": "Nightmare Disorder",
+      "icd10": "F51.5",
+      "icd9": "307.47",
+      "keywords": ["nightmares", "night terrors", "bad dreams", "waking from dreams scared", "recurring nightmares", "nightmare disorder"]
+    },
+    {
+      "id": "SLP-007",
+      "category_id": 12,
+      "category": "Sleep-Wake Disorders",
+      "subcategory": "Parasomnias",
+      "disorder": "Restless Legs Syndrome",
+      "icd10": "G25.81",
+      "icd9": "333.94",
+      "keywords": ["restless legs", "RLS", "urge to move legs", "legs uncomfortable at night", "crawling sensation in legs", "leg discomfort at night"]
+    },
+    {
+      "id": "SEX-001",
+      "category_id": 13,
+      "category": "Sexual Dysfunctions",
+      "subcategory": "Sexual Dysfunctions",
+      "disorder": "Erectile Disorder",
+      "icd10": "F52.21",
+      "icd9": "302.72",
+      "keywords": ["erectile dysfunction", "ED", "can't maintain erection", "impotence", "sexual dysfunction male", "erection problems"]
+    },
+    {
+      "id": "SEX-002",
+      "category_id": 13,
+      "category": "Sexual Dysfunctions",
+      "subcategory": "Sexual Dysfunctions",
+      "disorder": "Female Orgasmic Disorder",
+      "icd10": "F52.31",
+      "icd9": "302.73",
+      "keywords": ["female orgasm disorder", "anorgasmia", "can't orgasm", "difficulty reaching orgasm female", "sexual dysfunction female"]
+    },
+    {
+      "id": "SEX-003",
+      "category_id": 13,
+      "category": "Sexual Dysfunctions",
+      "subcategory": "Sexual Dysfunctions",
+      "disorder": "Male Hypoactive Sexual Desire Disorder",
+      "icd10": "F52.0",
+      "icd9": "302.71",
+      "keywords": ["low libido male", "no sexual desire male", "loss of interest in sex", "hypoactive sexual desire", "low sex drive male"]
+    },
+    {
+      "id": "DIS2-001",
+      "category_id": 15,
+      "category": "Disruptive, Impulse-Control, and Conduct Disorders",
+      "subcategory": "Disruptive Behavior Disorders",
+      "disorder": "Oppositional Defiant Disorder",
+      "icd10": "F91.3",
+      "icd9": "313.81",
+      "keywords": ["ODD", "oppositional defiant", "defiant behavior", "argues with authority", "refuses rules", "angry child", "vindictive", "spiteful behavior", "deliberately annoys others"]
+    },
+    {
+      "id": "DIS2-002",
+      "category_id": 15,
+      "category": "Disruptive, Impulse-Control, and Conduct Disorders",
+      "subcategory": "Disruptive Behavior Disorders",
+      "disorder": "Intermittent Explosive Disorder",
+      "icd10": "F63.81",
+      "icd9": "312.34",
+      "keywords": ["explosive anger", "rage attacks", "uncontrollable anger", "violent outbursts", "IED", "intermittent explosive", "sudden aggression", "anger disorder", "road rage disorder"]
+    },
+    {
+      "id": "DIS2-003",
+      "category_id": 15,
+      "category": "Disruptive, Impulse-Control, and Conduct Disorders",
+      "subcategory": "Disruptive Behavior Disorders",
+      "disorder": "Conduct Disorder",
+      "icd10": "F91.x",
+      "icd9": "312.8x",
+      "keywords": ["conduct disorder", "aggressive behavior", "bullying", "destroying property", "theft", "rule breaking", "antisocial child", "cruelty to animals", "fighting", "truancy"]
+    },
+    {
+      "id": "DIS2-004",
+      "category_id": 15,
+      "category": "Disruptive, Impulse-Control, and Conduct Disorders",
+      "subcategory": "Impulse-Control Disorders",
+      "disorder": "Kleptomania",
+      "icd10": "F63.2",
+      "icd9": "312.32",
+      "keywords": ["kleptomania", "compulsive stealing", "stealing for no reason", "can't stop stealing", "shoplifting compulsion"]
+    },
+    {
+      "id": "DIS2-005",
+      "category_id": 15,
+      "category": "Disruptive, Impulse-Control, and Conduct Disorders",
+      "subcategory": "Impulse-Control Disorders",
+      "disorder": "Pyromania",
+      "icd10": "F63.1",
+      "icd9": "312.33",
+      "keywords": ["pyromania", "compulsive fire setting", "fascination with fire", "setting fires", "fire obsession"]
+    },
+    {
+      "id": "SUB-001",
+      "category_id": 16,
+      "category": "Substance-Related and Addictive Disorders",
+      "subcategory": "Alcohol-Related Disorders",
+      "disorder": "Alcohol Use Disorder",
+      "icd10": "F10.10-F10.20",
+      "icd9": "303.90-305.00",
+      "specifiers": ["Mild", "Moderate", "Severe"],
+      "keywords": ["alcohol use disorder", "alcoholism", "drinking problem", "alcohol addiction", "heavy drinking", "can't stop drinking", "alcohol dependence", "binge drinking", "AUD"]
+    },
+    {
+      "id": "SUB-002",
+      "category_id": 16,
+      "category": "Substance-Related and Addictive Disorders",
+      "subcategory": "Cannabis-Related Disorders",
+      "disorder": "Cannabis Use Disorder",
+      "icd10": "F12.10-F12.20",
+      "icd9": "304.30-305.20",
+      "keywords": ["cannabis use disorder", "marijuana addiction", "weed addiction", "cannabis dependence", "marijuana use disorder", "daily cannabis use"]
+    },
+    {
+      "id": "SUB-003",
+      "category_id": 16,
+      "category": "Substance-Related and Addictive Disorders",
+      "subcategory": "Opioid-Related Disorders",
+      "disorder": "Opioid Use Disorder",
+      "icd10": "F11.10-F11.20",
+      "icd9": "304.00-305.50",
+      "keywords": ["opioid use disorder", "opioid addiction", "heroin addiction", "prescription painkiller addiction", "opioid dependence", "narcotic addiction", "fentanyl addiction"]
+    },
+    {
+      "id": "SUB-004",
+      "category_id": 16,
+      "category": "Substance-Related and Addictive Disorders",
+      "subcategory": "Stimulant-Related Disorders",
+      "disorder": "Stimulant Use Disorder",
+      "icd10": "F14.x-F15.x",
+      "icd9": "304.20-305.70",
+      "keywords": ["stimulant use disorder", "cocaine addiction", "meth addiction", "amphetamine addiction", "stimulant addiction", "crack cocaine", "methamphetamine use"]
+    },
+    {
+      "id": "SUB-005",
+      "category_id": 16,
+      "category": "Substance-Related and Addictive Disorders",
+      "subcategory": "Non-Substance-Related Disorders",
+      "disorder": "Gambling Disorder",
+      "icd10": "F63.0",
+      "icd9": "312.31",
+      "keywords": ["gambling disorder", "compulsive gambling", "problem gambling", "gambling addiction", "can't stop gambling", "betting addiction", "casino addiction", "online gambling addiction"]
+    },
+    {
+      "id": "NCD-001",
+      "category_id": 17,
+      "category": "Neurocognitive Disorders",
+      "subcategory": "Delirium",
+      "disorder": "Delirium",
+      "icd10": "F05",
+      "icd9": "293.0",
+      "keywords": ["delirium", "confused and disoriented", "sudden confusion", "not knowing where they are", "incoherent", "acute confusion", "clouded consciousness", "hospital confusion"]
+    },
+    {
+      "id": "NCD-002",
+      "category_id": 17,
+      "category": "Neurocognitive Disorders",
+      "subcategory": "Major and Mild Neurocognitive Disorders",
+      "disorder": "Major Neurocognitive Disorder Due to Alzheimer's Disease",
+      "icd10": "F02.81-F02.80",
+      "icd9": "294.11-294.10",
+      "keywords": ["Alzheimer's", "Alzheimer disease", "dementia", "memory loss", "forgetting names", "forgetting recent events", "severe memory impairment", "major dementia"]
+    },
+    {
+      "id": "NCD-003",
+      "category_id": 17,
+      "category": "Neurocognitive Disorders",
+      "subcategory": "Major and Mild Neurocognitive Disorders",
+      "disorder": "Mild Neurocognitive Disorder Due to Alzheimer's Disease",
+      "icd10": "G31.84",
+      "icd9": "331.83",
+      "keywords": ["mild cognitive impairment", "early Alzheimer's", "memory concerns", "MCI", "mild memory loss", "early dementia", "mild cognitive decline"]
+    },
+    {
+      "id": "NCD-004",
+      "category_id": 17,
+      "category": "Neurocognitive Disorders",
+      "subcategory": "Major and Mild Neurocognitive Disorders",
+      "disorder": "Major or Mild Vascular Neurocognitive Disorder",
+      "icd10": "F01.51-G31.84",
+      "icd9": "290.40-331.83",
+      "keywords": ["vascular dementia", "dementia after stroke", "multi-infarct dementia", "cognitive decline from stroke", "vascular cognitive impairment"]
+    },
+    {
+      "id": "NCD-005",
+      "category_id": 17,
+      "category": "Neurocognitive Disorders",
+      "subcategory": "Major and Mild Neurocognitive Disorders",
+      "disorder": "Major or Mild Neurocognitive Disorder Due to Parkinson's Disease",
+      "icd10": "F02.81-G31.84",
+      "icd9": "294.11-331.83",
+      "keywords": ["Parkinson's dementia", "cognitive decline Parkinson's", "memory loss Parkinson's", "Parkinson's disease dementia"]
+    },
+    {
+      "id": "PER-001",
+      "category_id": 18,
+      "category": "Personality Disorders",
+      "subcategory": "Cluster A - Odd or Eccentric",
+      "disorder": "Paranoid Personality Disorder",
+      "icd10": "F60.0",
+      "icd9": "301.0",
+      "keywords": ["paranoid personality", "suspicious of everyone", "distrustful", "believes people are against them", "can't trust anyone", "sees hidden meanings", "holds grudges"]
+    },
+    {
+      "id": "PER-002",
+      "category_id": 18,
+      "category": "Personality Disorders",
+      "subcategory": "Cluster A - Odd or Eccentric",
+      "disorder": "Schizoid Personality Disorder",
+      "icd10": "F60.1",
+      "icd9": "301.20",
+      "keywords": ["schizoid personality", "emotionally cold", "loner", "no desire for relationships", "indifferent to others", "detached", "prefers to be alone", "no close friends"]
+    },
+    {
+      "id": "PER-003",
+      "category_id": 18,
+      "category": "Personality Disorders",
+      "subcategory": "Cluster B - Dramatic or Erratic",
+      "disorder": "Antisocial Personality Disorder",
+      "icd10": "F60.2",
+      "icd9": "301.7",
+      "keywords": ["antisocial personality", "ASPD", "psychopathy", "sociopath", "manipulative", "no empathy", "disregards rules", "criminal behavior", "exploits others", "deceitful", "aggressive"]
+    },
+    {
+      "id": "PER-004",
+      "category_id": 18,
+      "category": "Personality Disorders",
+      "subcategory": "Cluster B - Dramatic or Erratic",
+      "disorder": "Borderline Personality Disorder",
+      "icd10": "F60.3",
+      "icd9": "301.83",
+      "keywords": ["BPD", "borderline personality", "fear of abandonment", "unstable relationships", "identity confusion", "self-harm", "impulsivity", "emotional dysregulation", "splitting", "intense emotions", "chronic emptiness", "suicidal behavior BPD"]
+    },
+    {
+      "id": "PER-005",
+      "category_id": 18,
+      "category": "Personality Disorders",
+      "subcategory": "Cluster B - Dramatic or Erratic",
+      "disorder": "Narcissistic Personality Disorder",
+      "icd10": "F60.81",
+      "icd9": "301.81",
+      "keywords": ["narcissistic personality", "NPD", "narcissism", "grandiosity", "needs admiration", "lacks empathy", "entitled", "exploits others", "arrogant", "envious"]
+    },
+    {
+      "id": "PER-006",
+      "category_id": 18,
+      "category": "Personality Disorders",
+      "subcategory": "Cluster C - Anxious or Fearful",
+      "disorder": "Avoidant Personality Disorder",
+      "icd10": "F60.6",
+      "icd9": "301.82",
+      "keywords": ["avoidant personality", "afraid of rejection", "avoids social situations", "low self-esteem personality", "feels inadequate", "shy and withdrawn", "fear of criticism", "avoids new activities"]
+    },
+    {
+      "id": "PER-007",
+      "category_id": 18,
+      "category": "Personality Disorders",
+      "subcategory": "Cluster C - Anxious or Fearful",
+      "disorder": "Obsessive-Compulsive Personality Disorder",
+      "icd10": "F60.5",
+      "icd9": "301.4",
+      "keywords": ["OCPD", "perfectionism", "obsessive personality", "rigid rules", "preoccupied with order", "inflexible", "workaholic", "overly conscientious", "can't delegate", "not same as OCD"]
+    },
+    {
+      "id": "MED-001",
+      "category_id": 21,
+      "category": "Medication-Induced Movement Disorders",
+      "subcategory": "Medication-Induced Disorders",
+      "disorder": "Tardive Dyskinesia",
+      "icd10": "G24.01",
+      "icd9": "333.85",
+      "keywords": ["tardive dyskinesia", "involuntary movements from medication", "antipsychotic side effects", "repetitive involuntary movements", "facial grimacing from meds"]
+    },
+    {
+      "id": "MED-002",
+      "category_id": 21,
+      "category": "Medication-Induced Movement Disorders",
+      "subcategory": "Medication-Induced Disorders",
+      "disorder": "Neuroleptic Malignant Syndrome",
+      "icd10": "G21.0",
+      "icd9": "333.92",
+      "keywords": ["neuroleptic malignant syndrome", "NMS", "fever from antipsychotics", "muscle rigidity from medication", "antipsychotic emergency"]
+    },
+    {
+      "id": "MED-003",
+      "category_id": 21,
+      "category": "Medication-Induced Movement Disorders",
+      "subcategory": "Medication-Induced Disorders",
+      "disorder": "Antidepressant Discontinuation Syndrome",
+      "icd10": "T43.205A",
+      "icd9": "995.29",
+      "keywords": ["antidepressant discontinuation", "stopping antidepressants", "SSRI discontinuation", "withdrawal from antidepressants", "brain zaps", "side effects stopping medication"]
+    }
+  ]
+}

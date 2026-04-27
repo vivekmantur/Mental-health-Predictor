@@ -1,65 +1,61 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "../styles/assessment.css";
-
-import {
-  Editor,
-  EditorProvider,
-  Toolbar,
-  BtnBold,
-  BtnItalic,
-  BtnUnderline,
-  BtnBulletList,
-  BtnNumberedList
-} from "react-simple-wysiwyg";
+import { useNavigate } from "react-router-dom";
 
 const questions = [
   "Little interest or pleasure in doing things",
   "Feeling down, depressed, or hopeless",
-  "Trouble sleeping",
+  "Trouble falling or staying asleep, or sleeping too much",
   "Feeling tired or having little energy",
   "Poor appetite or overeating",
-  "Feeling bad about yourself",
-  "Trouble concentrating",
-  "Moving or speaking slowly",
-  "Thoughts of self-harm or suicide"
+  "Feeling bad about yourself — or that you are a failure",
+  "Trouble concentrating on things",
+  "Moving or speaking slowly or being restless",
+  "Thoughts that you would be better off dead or hurting yourself"
 ];
 
-const AssessmentForm = ({ onResult }) => {
-  const [answers, setAnswers] = useState(Array(9).fill(""));
-  const [loading, setLoading] = useState(false);
+const options = [
+  { label: "Not at all", value: 0 },
+  { label: "Several days", value: 1 },
+  { label: "More than half the days", value: 2 },
+  { label: "Nearly every day", value: 3 }
+];
 
-  const handleChange = (index, value) => {
+export default function AssessmentForm() {
+  const [answers, setAnswers] = useState(Array(9).fill(null));
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (qIndex, value) => {
     const updated = [...answers];
-    updated[index] = value;
+    updated[qIndex] = value;
     setAnswers(updated);
   };
 
-  const cleanHTML = (html) => {
-    return html.replace(/<[^>]+>/g, "").trim();
-  };
-
   const handleSubmit = async () => {
-    if (answers.some(a => cleanHTML(a) === "")) {
+    if (answers.includes(null)) {
       alert("Please answer all questions");
       return;
     }
 
     setLoading(true);
+    const token = sessionStorage.getItem("token");
 
     try {
-      const cleanedAnswers = answers.map(a => cleanHTML(a));
-
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/v1/phq9/submit`,
+      await axios.post(
+        `http://localhost:8000/api/v1/phq9/submit`,
+        { answers, notes },
         {
-            user_id: "user_ai_2",
-            answers_text: cleanedAnswers
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
         }
-        );
+      );
 
-      onResult(response.data);
-
+      navigate("/my-assessments");
     } catch (error) {
       console.error(error);
       alert("Error occurred");
@@ -69,42 +65,48 @@ const AssessmentForm = ({ onResult }) => {
   };
 
   return (
-    <div>
+    <>
       <h2 className="title">PHQ-9 Assessment</h2>
 
-      {questions.map((q, index) => (
-        <div className="card" key={index}>
+      {/* ✅ GRID START */}
+      <div className="questions-grid">
+        {questions.map((q, index) => (
+          <div className="card" key={index}>
+            <div className="question">
+              {index + 1}. {q}
+            </div>
 
-          <div className="question">
-            {index + 1}. {q}
+            <div className="options">
+              {options.map((opt) => (
+                <label key={opt.value} className="radio-label">
+                  <input
+                    type="radio"
+                    name={`q${index}`}
+                    checked={answers[index] === opt.value}
+                    onChange={() => handleChange(index, opt.value)}
+                  />
+                  {opt.label}
+                </label>
+              ))}
+            </div>
           </div>
+        ))}
+      </div>
 
-          {/* ✅ FIX: Separate Provider per Editor */}
-          <div className="editor-container">
-            <EditorProvider>
-              <Editor
-                value={answers[index]}
-                onChange={(e) => handleChange(index, e.target.value)}
-              >
-                <Toolbar>
-                  <BtnBold />
-                  <BtnItalic />
-                  <BtnUnderline />
-                  <BtnBulletList />
-                  <BtnNumberedList />
-                </Toolbar>
-              </Editor>
-            </EditorProvider>
-          </div>
-
-        </div>
-      ))}
+      {/* Notes */}
+      <div className="card">
+        <div className="question">Additional Notes (Optional)</div>
+        <textarea
+          className="notes-box"
+          placeholder="Enter any additional thoughts..."
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
+      </div>
 
       <button className="button" onClick={handleSubmit}>
-        {loading ? "Analyzing..." : "Analyze with AI"}
+        {loading ? "Submitting..." : "Submit Assessment"}
       </button>
-    </div>
+    </>
   );
-};
-
-export default AssessmentForm;
+}

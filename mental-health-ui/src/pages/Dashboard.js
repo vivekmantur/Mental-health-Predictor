@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/dashboard.css";
+import "../styles/landing.css";
 import bgImage from "../assets/mentalhealth.jpg";
 
 export default function Dashboard() {

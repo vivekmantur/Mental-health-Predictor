@@ -1,245 +1,197 @@
-import React, { useState } from "react";
-import "../styles/result.css";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
-} from "recharts";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-export default function ResultCard({ result }) {
+export default function ResultCard({ data, status }) {
+  const [editableData, setEditableData] = useState(null);
 
-  const [expanded, setExpanded] = useState(false);
+  const isEditable = status === "pending";
 
-  if (!result) return null;
+  useEffect(() => {
+    setEditableData(data);
 
-  const percentage = (result.score / 27) * 100;
+    // Auto resize textarea after render
+    setTimeout(() => {
+      const textareas = document.querySelectorAll(".textarea");
+      textareas.forEach((ta) => {
+        ta.style.height = "auto";
+        ta.style.height = ta.scrollHeight + "px";
+      });
+    }, 0);
+  }, [data]);
 
-  /* ✅ SINGLE SOURCE OF DATA */
-  const chartData = [
-    { subject: "Mood", value: result.ai_scores[1] || 0 },
-    { subject: "Energy", value: result.ai_scores[3] || 0 },
-    { subject: "Sleep", value: result.ai_scores[2] || 0 },
-    { subject: "Focus", value: result.ai_scores[6] || 0 },
-    { subject: "Self-worth", value: result.ai_scores[5] || 0 }
-  ];
+  if (!editableData) {
+    return <div>Loading...</div>;
+  }
 
-  /* 🔥 Convert text → points */
-  const toPoints = (text) => {
-    if (!text) return [];
-    return text
-      .replace(/\*\*/g, "")
-      .split(/\d+\.\s|\.\s/)
-      .map(t => t.trim())
-      .filter(t => t.length > 25);
+  // ✅ Auto resize while typing
+  const autoResize = (e) => {
+    e.target.style.height = "auto";
+    e.target.style.height = e.target.scrollHeight + "px";
   };
 
-  const insights = toPoints(result.insight).slice(0, 4);
-  const actions = toPoints(result.recommendation).slice(0, 5);
+  // ✅ Handle input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditableData({
+      ...editableData,
+      [name]: value,
+    });
+  };
 
-  /* 🎯 Severity color */
-  const getSeverityColor = (severity) => {
-    switch (severity?.toLowerCase()) {
-      case "minimal": return "#22c55e";
-      case "mild": return "#84cc16";
-      case "moderate": return "#f59e0b";
-      case "moderately severe": return "#f97316";
-      case "severe": return "#ef4444";
-      default: return "#6366f1";
+  // ✅ SAVE
+  const handleSave = async () => {
+    try {
+      await axios.put(
+        `http://localhost:8000/api/v1/doctor/assessments/${data.id}`,
+        {
+          score: editableData.score,
+          severity: editableData.severity,
+          insight: editableData.insight,
+          recommendation: editableData.recommendation,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      alert("Saved successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Save failed");
     }
+  };
+
+  // ✅ CONFIRM
+  const handleConfirm = async () => {
+    try {
+      // Step 1: Save content
+      await axios.put(
+        `http://localhost:8000/api/v1/doctor/assessments/${data.id}`,
+        {
+          score: editableData.score,
+          severity: editableData.severity,
+          insight: editableData.insight,
+          recommendation: editableData.recommendation,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      // Step 2: Update status
+      await axios.put(
+        `http://localhost:8000/api/v1/doctor/assessments/${data.id}/status`,
+        {
+          status: "success",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      alert("Confirmed successfully");
+
+      // 🔥 Refresh UI
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("Confirm failed");
+    }
+  };
+
+  // ✅ Format bullets
+  const formatText = (text) => {
+    if (!text) return "";
+    return text.replace(/\*\*(.*?)\*\*/g, "\n🔹 $1\n");
   };
 
   return (
     <div className="result-card">
+      <h2 className="email">{editableData.email}</h2>
 
-      {/* ===== TITLE ===== */}
-      <h3>Your Mental Health Report</h3>
+      <div className="row">
+        <div className="field">
+          <label>Score</label>
+          <input
+            type="number"
+            name="score"
+            value={editableData.score || ""}
+            onChange={handleChange}
+            disabled={!isEditable}
+          />
+        </div>
 
-      {/* ===== SCORE BAR ===== */}
-      <div className="meter-bar">
-        <div
-          className="meter-fill"
-          style={{ width: `${percentage}%` }}
-        />
+        <div className="field">
+          <label>Severity</label>
+          <input
+            type="text"
+            name="severity"
+            value={editableData.severity || ""}
+            onChange={handleChange}
+            disabled={!isEditable}
+          />
+        </div>
       </div>
 
-      {/* ===== SCORE + SEVERITY ===== */}
-      <div className="score-row">
-        <span>{result.score}/27</span>
+      {/* Insight */}
+      <div className="field">
+        <label>Insight</label>
 
-        <span
-          className="severity-badge"
-          style={{ background: getSeverityColor(result.severity) }}
-        >
-          {result.severity}
-        </span>
+        {isEditable ? (
+          <textarea
+            name="insight"
+            value={editableData.insight || ""}
+            onChange={(e) => {
+              handleChange(e);
+              autoResize(e);
+            }}
+            className="textarea"
+          />
+        ) : (
+          <div className="text-display">
+            {editableData.insight}
+          </div>
+        )}
       </div>
 
-      {/* ===== CHART SECTION ===== */}
-      <div className="result-section">
+      {/* Recommendation */}
+      <div className="field">
+        <label>Recommendation</label>
 
-        <div className="chart-header">
-          <h4>Mental Health Overview</h4>
+        {isEditable ? (
+          <textarea
+            name="recommendation"
+            value={editableData.recommendation || ""}
+            onChange={(e) => {
+              handleChange(e);
+              autoResize(e);
+            }}
+            className="textarea"
+          />
+        ) : (
+          <div className="text-display">
+            {formatText(editableData.recommendation)}
+          </div>
+        )}
+      </div>
 
-          <button className="expand-btn" onClick={() => setExpanded(true)}>
-            ⤢
+      {isEditable && (
+        <div className="btn-group">
+          <button className="save-btn" onClick={handleSave}>
+            Save
+          </button>
+
+          <button className="confirm-btn" onClick={handleConfirm}>
+            Confirm
           </button>
         </div>
-
-        <div className="chart-row">
-
-          {/* 🔵 RADAR CHART */}
-          <div className="chart-box">
-            <ResponsiveContainer width="100%" height={260}>
-              <RadarChart data={chartData}>
-                <PolarGrid stroke="#c7d8e6" />
-                <PolarAngleAxis
-                  dataKey="subject"
-                  tick={{ fill: "#37526d", fontSize: 12 }}
-                />
-                <PolarRadiusAxis
-                  domain={[0, 3]}
-                  tick={{ fill: "#7a93ad" }}
-                />
-                <Radar
-                  dataKey="value"
-                  stroke="#1d74bf"
-                  fill="#7dc7f4"
-                  fillOpacity={0.5}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* 🟣 BAR CHART */}
-          <div className="chart-box">
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart
-                data={chartData}
-                margin={{ top: 10, right: 20, left: 0, bottom: 40 }}
-              >
-                <XAxis
-                  dataKey="subject"
-                  interval={0}   // ✅ SHOW ALL LABELS
-                  stroke="#9eb6cc"
-                  tick={{ fill: "#37526d", fontSize: 12 }}
-                />
-                <YAxis
-                  domain={[0, 3]}
-                  stroke="#9eb6cc"
-                  tick={{ fill: "#7a93ad" }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #d5e2ee",
-                    borderRadius: "12px",
-                    boxShadow: "0 16px 32px rgba(25, 65, 106, 0.12)",
-                    color: "#16324f"
-                  }}
-                />
-                <Bar
-                  dataKey="value"
-                  fill="#1d74bf"
-                  radius={[6, 6, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-        </div>
-
-        <p className="chart-hint">
-          Radar shows balance • Bars show intensity
-        </p>
-      </div>
-
-      {/* ===== INSIGHTS ===== */}
-      <div className="result-section">
-        <h4>Insights</h4>
-
-        <div className="insight-grid">
-          {insights.map((item, i) => (
-            <div key={i} className="insight-card">
-              {item}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ===== ACTION PLAN ===== */}
-      <div className="result-section">
-        <h4>What You Can Do</h4>
-
-        <ul className="action-list">
-          {actions.map((item, i) => (
-            <li key={i}>{item}</li>
-          ))}
-        </ul>
-      </div>
-
-      {/* ===== FULL SCREEN MODAL ===== */}
-      {expanded && (
-        <div className="modal-overlay">
-
-          <div className="modal-content">
-
-            <button
-              className="close-btn"
-              onClick={() => setExpanded(false)}
-            >
-              ✕
-            </button>
-
-            <h3>Detailed Mental Health Analysis</h3>
-
-            <div className="modal-charts">
-
-              {/* RADAR */}
-              <ResponsiveContainer width="50%" height={400}>
-                <RadarChart data={chartData}>
-                  <PolarGrid stroke="#c7d8e6" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: "#37526d" }} />
-                  <PolarRadiusAxis domain={[0, 3]} tick={{ fill: "#7a93ad" }} />
-                  <Radar
-                    dataKey="value"
-                    stroke="#1d74bf"
-                    fill="#7dc7f4"
-                    fillOpacity={0.6}
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
-
-              {/* BAR */}
-              <ResponsiveContainer width="50%" height={400}>
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 10, right: 20, left: 0, bottom: 40 }}
-                >
-                  <XAxis
-                    dataKey="subject"
-                    interval={0}
-                    stroke="#9eb6cc"
-                    tick={{ fill: "#37526d", fontSize: 12 }}
-                  />
-                  <YAxis stroke="#9eb6cc" tick={{ fill: "#7a93ad" }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #d5e2ee",
-                      borderRadius: "12px",
-                      boxShadow: "0 16px 32px rgba(25, 65, 106, 0.12)",
-                      color: "#16324f"
-                    }}
-                  />
-                  <Bar dataKey="value" fill="#1d74bf" />
-                </BarChart>
-              </ResponsiveContainer>
-
-            </div>
-
-          </div>
-        </div>
       )}
-
     </div>
   );
 }

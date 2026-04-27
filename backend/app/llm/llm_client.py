@@ -30,132 +30,6 @@ PHQ9_QUESTIONS = [
 ]
 
 
-# ---------------------------------------------------------
-# AI-Based PHQ-9 Scoring Function
-# ---------------------------------------------------------
-def ai_score_answers(answers):
-    """
-    Converts free-text user answers into PHQ-9 scores (0–3)
-    using an LLM (Groq API).
-
-    Args:
-        answers (list[str]): List of 9 textual answers
-
-    Returns:
-        list[int]: Validated PHQ-9 scores
-    """
-
-    # Debug log (replace with logger in production)
-    print("INPUT ANSWERS:", answers)
-
-    # ---------------------------------------------------------
-    # Prompt Engineering: Provide structured instructions
-    # ---------------------------------------------------------
-    prompt = f"""
-    You are an expert clinical PHQ-9 scoring assistant. 
-    A user has provided free-text descriptions of their mental health symptoms over the last 2 weeks. 
-    
-    The responses do NOT contain standard frequency choices (like "Several days"). Instead, they describe their feelings and habits qualitatively.
-
-    Your task: Assess the severity and implied frequency in each answer and assign a clinical PHQ-9 score (0-3).
-
-    SCORING RUBRIC (Adapted for Free-Text):
-    0 = Normal/Absent
-    1 = Mild/Occasional
-    2 = Moderate/Frequent
-    3 = Severe/Constant
-
-    CRITICAL RULES:
-    - Use intensity modifiers (e.g., "always", "barely", "normal")
-    - If ambiguous → default to 1
-    - Q9 (self-harm) must be handled carefully
-
-    QUESTIONS AND USER ANSWERS:
-    1. {PHQ9_QUESTIONS[0]} | Answer: "{answers[0]}"
-    2. {PHQ9_QUESTIONS[1]} | Answer: "{answers[1]}"
-    3. {PHQ9_QUESTIONS[2]} | Answer: "{answers[2]}"
-    4. {PHQ9_QUESTIONS[3]} | Answer: "{answers[3]}"
-    5. {PHQ9_QUESTIONS[4]} | Answer: "{answers[4]}"
-    6. {PHQ9_QUESTIONS[5]} | Answer: "{answers[5]}"
-    7. {PHQ9_QUESTIONS[6]} | Answer: "{answers[6]}"
-    8. {PHQ9_QUESTIONS[7]} | Answer: "{answers[7]}"
-    9. {PHQ9_QUESTIONS[8]} | Answer: "{answers[8]}"
-
-    Return ONLY JSON:
-    {{"scores": [s1, s2, s3, s4, s5, s6, s7, s8, s9]}}
-    """
-
-    try:
-        # ---------------------------------------------------------
-        # Call Groq LLM API
-        # ---------------------------------------------------------
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "You output ONLY valid JSON."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0,
-            response_format={"type": "json_object"}  # Enforce JSON
-        )
-
-        raw_output = response.choices[0].message.content.strip()
-
-        # Debug log
-        print("🔴 RAW LLM OUTPUT:", raw_output)
-
-        # ---------------------------------------------------------
-        # Parse and validate scores
-        # ---------------------------------------------------------
-        return extract_scores(raw_output)
-
-    except Exception as e:
-        # Fallback in case of API failure
-        print("❌ API ERROR:", str(e))
-        return [0] * 9
-
-
-# ---------------------------------------------------------
-# SAFE JSON PARSER (CRITICAL FOR RELIABILITY)
-# ---------------------------------------------------------
-def extract_scores(json_str):
-    """
-    Validates and extracts PHQ-9 scores from LLM JSON output.
-
-    Ensures:
-    - Correct JSON format
-    - Exactly 9 scores
-    - Values are integers in range [0–3]
-    """
-
-    try:
-        data = json.loads(json_str)
-        scores = data.get("scores", [])
-
-        # Validate structure
-        if not isinstance(scores, list) or len(scores) != 9:
-            print(f"❌ PARSE ERROR: Length is {len(scores)}, expected 9")
-            return [0] * 9
-
-        # Validate values
-        validated = []
-        for s in scores:
-            if isinstance(s, int) and s in [0, 1, 2, 3]:
-                validated.append(s)
-            else:
-                print(f"⚠️ INVALID SCORE FOUND: {s}, defaulting to 0.")
-                validated.append(0)
-
-        print("🟢 PARSED SCORES:", validated)
-        return validated
-
-    except json.JSONDecodeError as e:
-        print("❌ JSON FORMAT ERROR:", str(e))
-        return [0] * 9
-
-    except Exception as e:
-        print("❌ UNEXPECTED PARSE ERROR:", str(e))
-        return [0] * 9
 
 
 # ---------------------------------------------------------
@@ -184,3 +58,52 @@ def generate_insight(prompt: str) -> str:
     )
 
     return response.choices[0].message.content.strip()
+
+
+def get_llm_response(prompt: str) -> dict:
+    """
+    Calls LLM and returns structured JSON response
+    with insight and recommendation.
+    """
+
+    print("PROMPT TO LLM:", prompt)
+
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[
+            {
+                "role": "system",
+                "content": """
+                You are a mental health assistant.
+
+                Always respond ONLY in valid JSON format like this:
+                {
+                "insight": "short supportive insight",
+                "recommendation": "clear actionable recommendation"
+                }
+"""
+            },
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.3
+    )
+
+    raw_output = response.choices[0].message.content.strip()
+
+    print("RAW LLM OUTPUT:", raw_output)
+
+    # ✅ Try parsing JSON safely
+    try:
+        parsed = json.loads(raw_output)
+        return {
+            "insight": parsed.get("insight", ""),
+            "recommendation": parsed.get("recommendation", "")
+        }
+    except Exception as e:
+        print("JSON PARSE ERROR:", e)
+
+        # 🔥 fallback (VERY IMPORTANT)
+        return {
+            "insight": raw_output,
+            "recommendation": "Please consider consulting a professional for further guidance."
+        }

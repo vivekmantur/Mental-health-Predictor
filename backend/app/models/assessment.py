@@ -1,51 +1,39 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, JSON
+from sqlalchemy import Column, Integer, String, DateTime, Text
 from datetime import datetime
 from app.db.database import Base
+from sqlalchemy import Column, String, Text, DateTime
+from datetime import datetime
 
 
-# ---------------------------------------------------------
-# Assessment Model
-# Represents a PHQ-9 assessment record in the database
-# ---------------------------------------------------------
 class Assessment(Base):
     __tablename__ = "assessments"
 
-    # -----------------------------------------------------
-    # Primary Identifier
-    # -----------------------------------------------------
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
 
-    # -----------------------------------------------------
-    # User Information
-    # -----------------------------------------------------
-    user_id = Column(String, index=True)
+    q1 = Column(Integer, nullable=False)
+    q2 = Column(Integer, nullable=False)
+    q3 = Column(Integer, nullable=False)
+    q4 = Column(Integer, nullable=False)
+    q5 = Column(Integer, nullable=False)
+    q6 = Column(Integer, nullable=False)
+    q7 = Column(Integer, nullable=False)
+    q8 = Column(Integer, nullable=False)
+    q9 = Column(Integer, nullable=False)
+    status = Column(String, default="pending")
+    insight = Column(Text)
+    recommendation = Column(Text)
+    doctor_notes = Column(Text)
+    approved_at = Column(DateTime, nullable=True)
 
-    # -----------------------------------------------------
-    # PHQ-9 Individual Question Scores (0–3 each)
-    # -----------------------------------------------------
-    q1 = Column(Integer)
-    q2 = Column(Integer)
-    q3 = Column(Integer)
-    q4 = Column(Integer)
-    q5 = Column(Integer)
-    q6 = Column(Integer)
-    q7 = Column(Integer)
-    q8 = Column(Integer)
-    q9 = Column(Integer)
+    score = Column(Integer)
+    severity = Column(String)
+    # ✅ DSM Mapping Fields
+    category = Column(String, nullable=True)
+    subcategory = Column(String, nullable=True)
+    disorder = Column(String, nullable=True)
 
-    # -----------------------------------------------------
-    # Aggregated Results
-    # -----------------------------------------------------
-    score = Column(Integer)        # Total PHQ-9 score (0–27)
-    severity = Column(String)      # Severity label (e.g., Mild, Moderate, Severe)
+    # ✅ NEW
+    notes = Column(Text, nullable=True)
 
-    # -----------------------------------------------------
-    # Raw User Input (Free-text answers)
-    # Stored as JSON for flexibility
-    # -----------------------------------------------------
-    answers_text = Column(JSON)
-
-    # -----------------------------------------------------
-    # Timestamp
-    # -----------------------------------------------------
     created_at = Column(DateTime, default=datetime.utcnow)

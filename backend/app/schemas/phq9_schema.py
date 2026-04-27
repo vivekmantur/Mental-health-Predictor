@@ -1,34 +1,43 @@
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, conlist
+from typing import List, Optional
 
 
-# ---------------------------------------------------------
-# Request Schema
-# ---------------------------------------------------------
 class PHQ9Request(BaseModel):
-    """
-    Schema for incoming PHQ-9 assessment request.
 
-    Attributes:
-        user_id (str): Unique identifier for the user
-        answers_text (List[str]): List of 9 free-text responses
-    """
-    user_id: str
-    answers_text: List[str]   # Expected length: 9
+    # exactly 9 answers, values 0–3
+    answers: conlist(int, min_length=9, max_length=9)
+
+    notes: Optional[str] = None
 
 
-# ---------------------------------------------------------
-# Response Schema
-# ---------------------------------------------------------
 class PHQ9Response(BaseModel):
-    """
-    Schema for PHQ-9 assessment response.
-
-    Attributes:
-        score (int): Total PHQ-9 score (0–27)
-        severity (str): Severity level (e.g., Mild, Moderate, Severe)
-        ai_scores (List[int]): Individual AI-generated scores (length 9)
-    """
     score: int
     severity: str
-    ai_scores: List[int]
+    answers: List[int]
+    insight: str
+    recommendation: str
+    
+
+class PHQ9SubmitResponse(BaseModel):
+    score: int
+    severity: str
+    status: str
+
+
+class PHQ9ResultResponse(BaseModel):
+    score: int
+    severity: str
+    answers: List[int]
+    insight: Optional[str]
+    recommendation: Optional[str]
+    status: str
+    
+class AssessmentUpdate(BaseModel):
+    score: int
+    severity: str
+    insight: Optional[str] = None
+    recommendation: Optional[str] = None
+
+
+class StatusUpdate(BaseModel):
+    status: str
