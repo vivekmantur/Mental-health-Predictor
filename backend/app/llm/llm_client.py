@@ -1,22 +1,43 @@
+"""
+LLM Service (Groq Integration)
+
+This module handles:
+- Generating mental health insights using LLM
+- Generating structured responses (insight + recommendation)
+
+Design Notes:
+- Uses Groq API (LLaMA model) for fast inference
+- Keeps temperature low for more deterministic responses
+- Includes fallback handling for invalid JSON responses
+"""
+
 import os
 import json
 from groq import Groq
 from dotenv import load_dotenv
 
+
 # ---------------------------------------------------------
 # Load environment variables (.env)
 # ---------------------------------------------------------
+# Ensures API keys and configs are available at runtime
 load_dotenv()
 
+
 # ---------------------------------------------------------
-# Initialize Groq client using API key
+# Initialize Groq client
 # ---------------------------------------------------------
+# Uses API key from environment variable
+# Example: GROQ_API_KEY=your_api_key_here
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 # ---------------------------------------------------------
-# PHQ-9 Questions (used for better LLM context)
+# PHQ-9 Questions (for contextual enrichment if needed)
 # ---------------------------------------------------------
+# Can be used to:
+# - Build richer prompts
+# - Map answers to questions for explainability
 PHQ9_QUESTIONS = [
     "1. Little interest or pleasure in doing things",
     "2. Feeling down, depressed, or hopeless",
@@ -30,42 +51,73 @@ PHQ9_QUESTIONS = [
 ]
 
 
-
-
 # ---------------------------------------------------------
 # Insight Generation (LLM-based)
 # ---------------------------------------------------------
 def generate_insight(prompt: str) -> str:
     """
-    Generates mental health insight from user input using LLM.
+    Generate a mental health insight using LLM.
 
     Args:
-        prompt (str): User input / processed context
+        prompt (str): Structured input containing score, severity, and notes
 
     Returns:
-        str: Insight text
+        str: Generated insight text
+
+    Notes:
+        - Uses low temperature for stable output
+        - Returns plain text (not structured JSON)
     """
 
+    # Debug: Log prompt sent to LLM (can be disabled in production)
     print("PROMPT TO LLM:", prompt)
 
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[
-            {"role": "system", "content": "You are a mental health assistant."},
-            {"role": "user", "content": prompt}
+            {
+                "role": "system",
+                "content": "You are a mental health assistant."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
         ],
-        temperature=0.2
+        temperature=0.2  # Lower = more deterministic output
     )
 
+    # Extract and clean response
     return response.choices[0].message.content.strip()
 
 
+# ---------------------------------------------------------
+# Structured LLM Response (Insight + Recommendation)
+# ---------------------------------------------------------
 def get_llm_response(prompt: str) -> dict:
     """
-    Calls LLM and returns structured JSON response
-    with insight and recommendation.
+    Generate structured response from LLM.
+
+    Expected Output Format:
+        {
+            "insight": "...",
+            "recommendation": "..."
+        }
+
+    Args:
+        prompt (str): Input prompt for LLM
+
+    Returns:
+        dict:
+            - insight (str)
+            - recommendation (str)
+
+    Fallback:
+        - If JSON parsing fails, returns raw output as insight
+        - Provides a default safe recommendation
     """
 
+    # Debug logging
     print("PROMPT TO LLM:", prompt)
 
     response = client.chat.completions.create(
@@ -83,27 +135,40 @@ def get_llm_response(prompt: str) -> dict:
                 }
 """
             },
-            {"role": "user", "content": prompt}
+            {
+                "role": "user",
+                "content": prompt
+            }
         ],
-        temperature=0.3
+        temperature=0.3  # Slightly higher for varied recommendations
     )
 
     raw_output = response.choices[0].message.content.strip()
 
+    # Debug: Raw model output
     print("RAW LLM OUTPUT:", raw_output)
 
-    # ✅ Try parsing JSON safely
+    # ---------------------------------------------------------
+    # Safe JSON Parsing
+    # ---------------------------------------------------------
     try:
         parsed = json.loads(raw_output)
+
         return {
             "insight": parsed.get("insight", ""),
             "recommendation": parsed.get("recommendation", "")
         }
+
     except Exception as e:
+        # Log parsing failure for debugging
         print("JSON PARSE ERROR:", e)
 
-        # 🔥 fallback (VERY IMPORTANT)
+        # -----------------------------------------------------
+        # Fallback Strategy (Critical for production stability)
+        # -----------------------------------------------------
         return {
-            "insight": raw_output,
-            "recommendation": "Please consider consulting a professional for further guidance."
+            "insight": raw_output,  # Use raw text if JSON fails
+            "recommendation": (
+                "Please consider consulting a professional for further guidance."
+            )
         }
