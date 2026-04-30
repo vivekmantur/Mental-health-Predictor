@@ -37,6 +37,7 @@ class AssessmentUpdate(BaseModel):
     severity: str
     insight: Optional[str] = None
     recommendation: Optional[str] = None
+    doctor_notes: Optional[str] = None
 
 
 class StatusUpdate(BaseModel):

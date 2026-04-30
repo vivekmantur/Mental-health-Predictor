@@ -184,6 +184,8 @@
 
 
 
+
+
 .logout-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 24px rgba(255, 0, 0, 0.3);
@@ -207,4 +209,21 @@
   color: white;
   border: none;
   cursor: pointer;
+}
+
+
+
+.auth-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #0d4a8f 0%, #2078c6 60%, #79d6ff 100%);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(8, 61, 111, 0.25);
+  transition: all 0.25s ease;
+
+  min-width: 110px;        /* ✅ FIX */
+  text-align: center;
 }

@@ -43,7 +43,7 @@ export default function RegisterPage() {
 
       alert("Registration successful!");
 
-      navigate("/assessment");
+      navigate("/my-assessments");
 
     } catch (err) {
       alert(err.message);

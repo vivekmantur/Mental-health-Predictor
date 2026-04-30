@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AssessmentForm from "../components/AssessmentForm";
-import bgImage from "../assets/mentalhealth.jpg";
+import UserHeader from "../components/UserHeader";
+import "../styles/assessmentform.css";   // form styles
+import "../styles/assessment.css";       // top navbar styles
 
 export default function AssessmentPage() {
   const navigate = useNavigate();
@@ -10,33 +12,43 @@ export default function AssessmentPage() {
     const token = sessionStorage.getItem("token");
     const user = JSON.parse(sessionStorage.getItem("user"));
 
-    // ❌ Not logged in
     if (!token) {
       navigate("/login", { replace: true });
       return;
     }
 
-    // ❌ Doctor trying to access patient page
     if (user?.usertype === "doctor") {
       navigate("/doctor", { replace: true });
       return;
     }
-
   }, [navigate]);
 
+  const user = JSON.parse(sessionStorage.getItem("user"));
+
   return (
-    <div
-      className="assessment-hero"
-      style={{
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <div className="overlay center-layout">
-        <div className="form-glass-card">
-          <AssessmentForm />
+    <div className="dashboard-container">
+
+      {/* ✅ SIDEBAR */}
+      <UserHeader />
+
+      {/* ✅ MAIN CONTENT */}
+      <div className="main-content">
+
+        {/* ✅ TOP NAVBAR */}
+        <div className="top-navbar">
+          <h3 className="brand">Assessment</h3>
+          <div className="user-email-box">
+            {user?.email}
+          </div>
         </div>
+
+        {/* ✅ FORM */}
+        <div style={{ padding: "20px" }}>
+          <div className="form-glass-card">
+            <AssessmentForm />
+          </div>
+        </div>
+
       </div>
     </div>
   );

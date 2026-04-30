@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
-import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
+import UserHeader from "../components/UserHeader";
+import { FiMaximize2, FiTrendingUp, FiTrendingDown } from "react-icons/fi";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import { MdOutlineSpeed } from "react-icons/md";
+import { BsGraphUp } from "react-icons/bs"; 
+import { useNavigate } from "react-router-dom";
 
 import {
   LineChart,
@@ -16,290 +20,308 @@ import {
 } from "recharts";
 
 export default function MyAssessmentsPage() {
-  const [data, setData] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [trendData, setTrendData] = useState(null);
-  const [expanded, setExpanded] = useState(false);
+  const [dashboard, setDashboard] = useState(null);
+  const [trendAnalysis, setTrendAnalysis] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
-  const navigate = useNavigate();
   const token = sessionStorage.getItem("token");
+  const email = sessionStorage.getItem("email");
+  const navigate = useNavigate();
 
-  const latestSuccess = data
-    .filter((item) => item.status === "success")
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-
+  // =========================
+  // FETCH DATA
+  // =========================
   useEffect(() => {
-    fetchData();
-    fetchTrend();
+    fetchDashboard();
+    fetchTrendAnalysis();
   }, []);
 
-  const fetchData = async () => {
+  const fetchDashboard = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8000/api/v1/phq9/my-assessments`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        "http://localhost:8000/api/v1/phq9/dashboard",
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setData(res.data || []);
+      setDashboard(res.data);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const fetchTrend = async () => {
+  const fetchTrendAnalysis = async () => {
     try {
       const res = await axios.get(
         "http://localhost:8000/api/v1/phq9/trend-analysis",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setTrendData(res.data || null);
+      setTrendAnalysis(res.data);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const successAssessments = data
-    .filter((item) => item.status === "success")
-    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  // =========================
+  // LOADING STATE
+  // =========================
+  if (!dashboard) {
+    return <p className="loading">Loading...</p>;
+  }
 
-  const chartData = successAssessments.map((item) => ({
-    date: new Date(item.created_at).toLocaleDateString(),
-    score: item.score,
-  }));
+  // =========================
+  // 🚨 NEW USER (NO DATA)
+  // =========================
+  if (!dashboard.latest) {
+    return (
+      <div className="dashboard-container">
+        <UserHeader />
 
-  const severityCount = {};
-  data.forEach((item) => {
-    if (item.status === "success") {
-      severityCount[item.severity] =
-        (severityCount[item.severity] || 0) + 1;
-    }
-  });
+        <div className="main-content">
+          <div className="top-navbar">
+            <h3 className="brand">Welcome</h3>
+            <div className="user-email-box">{email}</div>
+          </div>
 
-  const severityData = Object.keys(severityCount).map((key) => ({
-    severity: key,
-    count: severityCount[key],
-  }));
+          <div className="empty-state">
+            <h2>No Assessments Yet</h2>
+            <p>
+              You haven’t taken any PHQ-9 assessment yet.
+              Start your first assessment to see insights.
+            </p>
 
-  const getSeverityRange = (score) => {
-    if (!score && score !== 0) return "Unknown";
-    if (score <= 4) return "Minimal";
-    if (score <= 9) return "Mild";
-    if (score <= 14) return "Moderate";
-    return "Severe";
-  };
-
-  // ✅ UNIVERSAL SAFE RENDER
-  const renderRecommendation = (rec) => {
-    if (!rec) return <p>No recommendation available</p>;
-
-    if (typeof rec === "string") {
-      return <p>{rec}</p>;
-    }
-
-    if (Array.isArray(rec)) {
-      return (
-        <ul>
-          {rec.map((item, i) => (
-            <li key={i}>{String(item)}</li>
-          ))}
-        </ul>
-      );
-    }
-
-    if (typeof rec === "object") {
-      return (
-        <div>
-          {Object.entries(rec).map(([key, value]) => (
-            <div key={key} style={{ marginBottom: "10px" }}>
-              <b>{key}</b>
-              <p>{String(value)}</p>
-            </div>
-          ))}
+            <button
+              className="primary-btn"
+              onClick={() => navigate("/assessment")}
+            >
+              Take Assessment
+            </button>
+          </div>
         </div>
-      );
-    }
+      </div>
+    );
+  }
 
-    return <p>{String(rec)}</p>;
-  };
+  // =========================
+  // SAFE DATA
+  // =========================
+  const { latest, trend } = dashboard;
 
+  const questionData = (latest.answers || []).map((val, i) => ({
+    name: `Q${i + 1}`,
+    value: val === 0 ? null : val
+  }));
+
+  // =========================
+  // MAIN UI
+  // =========================
   return (
     <div className="dashboard-container">
+      <UserHeader />
 
-      {/* HEADER */}
-      <div className="dashboard-header">
-        <h2>My Assessments</h2>
+      <div className="main-content">
 
-        <button
-          className="new-assessment-btn"
-          onClick={() => navigate("/assessment")}
-        >
-          + Check your mental health now
-        </button>
+        {/* TOP NAVBAR */}
+        <div className="top-navbar">
+        <h3 className="brand">Welcome</h3>
+
+        <div className="nav-right">
+          <button
+            className="take-assessment-btn"
+            onClick={() => navigate("/assessment")}
+          >
+            Take Assessment
+          </button>
+
+          <div className="user-email-box">
+            {email}
+          </div>
+        </div>
       </div>
 
-      <div className="dashboard-wrapper">
+        {/* HEADER */}
+        <div className="dashboard-header">
+          <div>
+            <h2 className="page-title">PHQ-9 Assessment</h2>
+            <p className="subtitle">Summary of your submitted assessment</p>
+          </div>
 
-        {/* LEFT */}
-        <div className="dashboard-left">
-          <div className="card-grid">
-            {data.map((item) => (
-              <div key={item.id} className="card">
-                <h3>{item.severity}</h3>
-                <p><b>Score:</b> {item.score}</p>
-
-                <p>
-                  <b>Status:</b>{" "}
-                  <span
-                    style={{
-                      color: item.status === "success" ? "green" : "orange",
-                      fontWeight: "600",
-                    }}
-                  >
-                    {item.status}
-                  </span>
-                </p>
-
-                {item.status === "success" && (
-                  <button
-                    className="view-btn"
-                    onClick={() => setSelected(item)}
-                  >
-                    View Result
-                  </button>
-                )}
-
-                {item.status === "pending" && (
-                  <p className="pending-text">
-                    Waiting for doctor approval...
-                  </p>
-                )}
-              </div>
-            ))}
+          <div className="assessment-date">
+            <FaRegCalendarAlt />
+            <div>
+              <span>Assessment Date</span>
+              <p>
+                {trend?.history?.length > 0
+                  ? trend.history[trend.history.length - 1].date
+                  : "-"}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* RIGHT */}
-        <div className="dashboard-right">
-          {expanded && (
-            <div
-              className="modal-backdrop-custom"
-              onClick={() => setExpanded(false)}
-            />
-          )}
+        {/* TOP CARDS */}
+        <div className="top-cards">
 
-          <div className={`trend-card ${expanded ? "expanded" : ""}`}>
-
-            <div className="trend-header">
-              <h3>Your Mental Health Insight</h3>
-
-              <button
-                className="expand-btn"
-                onClick={() => setExpanded(!expanded)}
-              >
-                {expanded ? <FiMinimize2 /> : <FiMaximize2 />}
-              </button>
+          <div className="top-card">
+            <div className="card-header">
+              <p>Total PHQ-9 Score</p>
+              <BsGraphUp className="icon purple" />
             </div>
+            <h2>{latest.score}</h2>
+            <span>out of 27</span>
+          </div>
 
-            {!trendData?.insight ? (
-              <p>Not enough data yet</p>
-            ) : (
-              <>
-                <div className="summary">
-                  <p><b>Latest:</b> {trendData?.latest_score}</p>
-                  <p><b>Previous:</b> {trendData?.previous_score}</p>
-                </div>
+          <div className="top-card">
+            <div className="card-header">
+              <p>Severity</p>
+              <MdOutlineSpeed className="icon orange" />
+            </div>
+            <h2 className="severity-text">{latest.severity}</h2>
+          </div>
 
-                {latestSuccess?.disorder && (
-                  <p>
-                    <b>Detected Condition:</b>{" "}
-                    <span style={{ color: "#2c7be5", fontWeight: "600" }}>
-                      {latestSuccess.disorder}
-                    </span>
-                  </p>
-                )}
+          <div className="top-card">
+            <div className="card-header">
+              <p>Previous</p>
+              <FiTrendingDown className="icon blue" />
+            </div>
+            <h2>{trend?.previous_score ?? "-"}</h2>
+          </div>
 
-                <p>
-                  <b>Current Status:</b>{" "}
-                  {getSeverityRange(trendData?.latest_score)}
-                </p>
+          <div className="top-card">
+            <div className="card-header">
+              <p>Change</p>
+              <FiTrendingUp className="icon red" />
+            </div>
+            <h2 className="change-text">
+              {trend?.previous_score !== null
+                ? latest.score - trend.previous_score
+                : "-"}
+            </h2>
+            <span>from previous</span>
+          </div>
 
-                <div className="trend-indicator">
-                  {trendData?.previous_score > trendData?.latest_score ? (
-                    <p className="improved">⬇ Improving</p>
-                  ) : (
-                    <p className="worsened">⬆ Needs Attention</p>
-                  )}
-                </div>
+        </div>
 
-                <div className="result-box">
-                  <h4>Insight</h4>
-                  <p>{trendData?.insight}</p>
-                </div>
+        {/* CHARTS */}
+        <div className="chart-section">
 
-                <div className="result-box">
-                  <h4>Recommendation</h4>
-                  {renderRecommendation(trendData?.recommendation)}
-                </div>
-              </>
-            )}
+          <div className="chart-card">
+            <h3>Question-wise Breakdown</h3>
+            <ResponsiveContainer width="100%" height={170}>
+              <BarChart data={questionData}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#7b6ef6" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
-            {/* Charts */}
-            <h4 style={{ marginTop: "20px" }}>Mood Trend</h4>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={chartData}>
+          <div className="chart-card">
+            <h3>PHQ-9 Score Trend</h3>
+            <ResponsiveContainer width="100%" height={170}>
+              <LineChart data={trend?.history || []}>
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="score" strokeWidth={3} />
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="#7b6ef6"
+                  strokeWidth={3}
+                />
               </LineChart>
             </ResponsiveContainer>
-
-            <h4 style={{ marginTop: "20px" }}>Severity Distribution</h4>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={severityData}>
-                <XAxis dataKey="severity" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" />
-              </BarChart>
-            </ResponsiveContainer>
-
           </div>
+
         </div>
+
+        {/* BOTTOM */}
+        <div className="bottom-section">
+
+          <div className="box">
+            <h3>Severity Scale</h3>
+            <div className="scale">
+              <span className="green">0–4 Minimal</span>
+              <span className="blue">5–9 Mild</span>
+              <span className="yellow">10–14 Moderate</span>
+              <span className="red">15–27 Severe</span>
+            </div>
+            <p>
+              Your score of <b>{latest.score}</b> falls in{" "}
+              <b>{latest.severity}</b>
+            </p>
+          </div>
+
+          <div className="box">
+            <h3>Key Insights</h3>
+            <p className="insight-text">{latest.insight}</p>
+          </div>
+
+          {/* DISORDER */}
+          <div className="box disorder-box">
+            <div className="disorder-header">
+            <h3>Detected Disorder</h3>
+
+            {trendAnalysis?.category && (
+              <button
+                className="expand-btn"
+                onClick={() => setShowModal(true)}
+              >
+                <FiMaximize2 />
+              </button>
+            )}
+          </div>
+
+            {trendAnalysis?.category ? (
+              <>
+                <p><b>Category:</b> {trendAnalysis.category}</p>
+                <p><b>Disorder:</b> {trendAnalysis.disorder}</p>
+              </>
+            ) : (
+              <p>No disorder identified</p>
+            )}
+          </div>
+
+        </div>
+
+        {/* MODAL */}
+        {showModal && (
+          <div className="modal-overlay" onClick={() => setShowModal(false)}>
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+
+              <button
+                className="close-btn"
+                onClick={() => setShowModal(false)}
+              >
+                ✕
+              </button>
+
+              <h2>Disorder Details</h2>
+
+              <p><b>Category:</b> {trendAnalysis?.category}</p>
+              <p><b>Disorder:</b> {trendAnalysis?.disorder}</p>
+
+              <h3>AI Insight</h3>
+              <p className="insight-text">
+                {trendAnalysis?.insight || "No insight available"}
+              </p>
+
+              <h3>Recommendations</h3>
+
+              {Array.isArray(trendAnalysis?.recommendation) ? (
+                <ul className="recommendation-list">
+                  {trendAnalysis.recommendation.map((rec, i) => (
+                    <li key={i}>{rec}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No recommendations available</p>
+              )}
+
+            </div>
+          </div>
+        )}
+
       </div>
-
-      {/* MODAL */}
-      {selected && (
-        <div className="modal-overlay" onClick={() => setSelected(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-
-            <button className="close-btn" onClick={() => setSelected(null)}>
-              ✖
-            </button>
-
-            <h2>Assessment Result</h2>
-
-            <p><b>Score:</b> {selected?.score}</p>
-            <p><b>Severity:</b> {selected?.severity}</p>
-
-            <hr />
-
-            <div className="result-box">
-              <h4>Insight</h4>
-              <p>{selected?.insight}</p>
-            </div>
-
-            <div className="result-box">
-              <h4>Recommendation</h4>
-              {renderRecommendation(selected?.recommendation)}
-            </div>
-
-          </div>
-        </div>
-      )}
     </div>
   );
 }

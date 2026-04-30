@@ -1,10 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { requestOtp, verifyOtp } from "../api/authapi";
 import "../styles/login.css";
-import { useEffect } from "react";
-
-
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -13,19 +10,22 @@ export default function LoginPage() {
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+
+  // 🔥 Auto redirect if already logged in
   useEffect(() => {
-  const token = sessionStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
-  if (token) {
-    const user = JSON.parse(sessionStorage.getItem("user"));
+    if (token) {
+      const user = JSON.parse(sessionStorage.getItem("user"));
 
-    if (user?.usertype === "doctor") {
-      navigate("/doctor", { replace: true });
-    } else {
-      navigate("/my-assessments", { replace: true });
+      if (user?.usertype === "doctor") {
+        navigate("/doctor", { replace: true });
+      } else {
+        navigate("/my-assessments", { replace: true });
+      }
     }
-  }
-}, []); 
+  }, [navigate]);
+
   // 🔹 Request OTP
   const handleRequestOtp = async () => {
     if (!phone) {
@@ -57,19 +57,22 @@ export default function LoginPage() {
       const res = await verifyOtp(phone, otp);
       const user = res.user;
 
-      // ✅ Store auth
+      // ✅ Store token
       sessionStorage.setItem("token", res.access_token);
+
+      // ✅ Store full user object
       sessionStorage.setItem("user", JSON.stringify(user));
 
+      // ✅ 🔥 Store email (IMPORTANT FIX)
+      const email = user?.email || `${phone}@user.com`; // fallback if email not present
+      sessionStorage.setItem("email", email);
+
       // ✅ Redirect based on role
-      if (user.usertype === "doctor") {
+      if (user?.usertype === "doctor") {
         navigate("/doctor", { replace: true });
       } else {
-        navigate("/my-assessments");
+        navigate("/my-assessments", { replace: true });
       }
-
-      // ❌ REMOVE THIS (not needed)
-      // window.location.reload();
 
     } catch (error) {
       alert(error.message || "Invalid OTP");
@@ -129,4 +132,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+} 

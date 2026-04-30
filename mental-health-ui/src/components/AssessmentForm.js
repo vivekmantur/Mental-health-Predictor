@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "../styles/assessment.css";
+import "../styles/assessmentform.css";
 import { useNavigate } from "react-router-dom";
 
 const questions = [
@@ -68,17 +68,20 @@ export default function AssessmentForm() {
     <>
       <h2 className="title">PHQ-9 Assessment</h2>
 
-      {/* ✅ GRID START */}
-      <div className="questions-grid">
+      {/* ✅ QUESTIONS */}
+      <div className="questions-container">
         {questions.map((q, index) => (
-          <div className="card" key={index}>
-            <div className="question">
+          <div className="question-row" key={index}>
+
+            {/* LEFT SIDE → QUESTION */}
+            <div className="question-text">
               {index + 1}. {q}
             </div>
 
-            <div className="options">
+            {/* RIGHT SIDE → OPTIONS */}
+            <div className="options-row">
               {options.map((opt) => (
-                <label key={opt.value} className="radio-label">
+                <label key={opt.value} className="radio-inline">
                   <input
                     type="radio"
                     name={`q${index}`}
@@ -89,13 +92,14 @@ export default function AssessmentForm() {
                 </label>
               ))}
             </div>
+
           </div>
         ))}
       </div>
 
-      {/* Notes */}
-      <div className="card">
-        <div className="question">Additional Notes (Optional)</div>
+      {/* ✅ NOTES */}
+      <div className="notes-card">
+        <div className="question-text">Additional Notes (Optional)</div>
         <textarea
           className="notes-box"
           placeholder="Enter any additional thoughts..."
@@ -104,7 +108,8 @@ export default function AssessmentForm() {
         />
       </div>
 
-      <button className="button" onClick={handleSubmit}>
+      {/* ✅ SUBMIT */}
+      <button className="submit-btn" onClick={handleSubmit}>
         {loading ? "Submitting..." : "Submit Assessment"}
       </button>
     </>

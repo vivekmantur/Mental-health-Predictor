@@ -62,3 +62,26 @@ def get_last_two_success_assessments(db, user_id):
         .limit(2)
         .all()
     )
+    
+def get_latest_success_assessment(db: Session, user_id: int):
+    return (
+        db.query(Assessment)
+        .filter(
+            Assessment.user_id == user_id,
+            Assessment.status == "success"
+        )
+        .order_by(Assessment.created_at.desc())
+        .first()
+    )
+
+
+def get_assessment_history(db: Session, user_id: int):
+    return (
+        db.query(Assessment)
+        .filter(
+            Assessment.user_id == user_id,
+            Assessment.status == "success"
+        )
+        .order_by(Assessment.created_at.asc())
+        .all()
+    )

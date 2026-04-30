@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import AssessmentPage from "./pages/AssessmentPage";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import MyAssessmentsPage from "./pages/MyAssessmentsPage";
+import AssessmentsListPage from "./pages/AssessmentsListPage";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -22,53 +23,77 @@ import "./styles/layout.css";
 function Layout() {
   const location = useLocation();
 
-  // ❌ Hide header on login/register (optional but recommended)
-  const hideHeaderRoutes = ["/login", "/register"];
-  const isHidden = hideHeaderRoutes.includes(location.pathname);
+  // 🔥 Routes where header should NOT appear
+  const hideHeaderRoutes = [
+    "/login",
+    "/register",
+    "/my-assessments",
+    "/assessments",
+    "/doctor",
+    "/assessment",
+  ];
+
+  const hideHeader = hideHeaderRoutes.includes(location.pathname);
 
   return (
     <div className="app-bg">
 
-      {/* HEADER */}
-      {!isHidden && <Header />}
+      {/* ✅ HEADER */}
+      {!hideHeader && <Header />}
 
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+      {/* ✅ MAIN CONTENT WRAPPER (IMPORTANT FIX) */}
+      <div className="app-content">
+        <Routes>
 
-        {/* Protected Routes */}
+          {/* 🔓 Public Routes */}
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
-       <Route
-        path="/assessment"
-        element={
-          <ProtectedRoute allowedRole="patient">
-            <AssessmentPage />
-          </ProtectedRoute>
-        }
-      />
+          {/* 🔐 Protected Routes */}
 
-        <Route
-          path="/doctor"
-          element={
-            <ProtectedRoute allowedRole="doctor">
-              <DoctorDashboard />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/assessment"
+            element={
+              <ProtectedRoute allowedRole="patient">
+                <AssessmentPage />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/my-assessments"
-          element={
-            <ProtectedRoute allowedRole="patient">
-              <MyAssessmentsPage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+          <Route
+            path="/doctor"
+            element={
+              <ProtectedRoute allowedRole="doctor">
+                <DoctorDashboard />
+              </ProtectedRoute>
+            }
+          />
 
+          <Route
+            path="/my-assessments"
+            element={
+              <ProtectedRoute allowedRole="patient">
+                <MyAssessmentsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/assessments"
+            element={
+              <ProtectedRoute allowedRole="patient">
+                <AssessmentsListPage />
+              </ProtectedRoute>
+            }
+          />
+
+        </Routes>
+      </div>
+
+      {/* ✅ FOOTER */}
       <Footer />
+
     </div>
   );
 }

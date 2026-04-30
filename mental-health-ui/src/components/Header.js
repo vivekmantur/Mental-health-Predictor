@@ -7,7 +7,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   // ✅ ALWAYS GET LATEST USER
-  const user = sessionStorage.getItem("user");
+  const user = JSON.parse(sessionStorage.getItem("user"));
 
   const handleLogout = () => {
     sessionStorage.removeItem("token");
@@ -42,12 +42,19 @@ export default function Header() {
             </>
           ) : (
             <>
-              <button onClick={() => navigate("/login")} className="login-btn">
-                Login
-              </button>
-              <button onClick={() => navigate("/register")} className="register-btn">
-                Register
-              </button>
+              <button
+              onClick={() => navigate("/login")}
+              className="auth-btn"
+            >
+              Login
+            </button>
+
+            <button
+              onClick={() => navigate("/register")}
+              className="auth-btn"
+            >
+              Register
+            </button>
             </>
           )}
 

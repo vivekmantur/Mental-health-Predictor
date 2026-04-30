@@ -6,6 +6,7 @@ from app.dependencies import get_current_user
 from app.models.assessment import Assessment
 from app.models.user import User
 from app.schemas.phq9_schema import AssessmentUpdate, StatusUpdate
+from datetime import datetime
 
 router = APIRouter()
 
@@ -91,7 +92,7 @@ def update_assessment(
     assessment.severity = data.severity
     assessment.insight = data.insight
     assessment.recommendation = data.recommendation
-
+    assessment.doctor_notes = data.doctor_notes
     db.commit()
     db.refresh(assessment)
 
@@ -113,14 +114,19 @@ def update_status(
     if not assessment:
         raise HTTPException(status_code=404, detail="Assessment not found")
 
+    # ✅ Update status
     assessment.status = data.status
+
+    # ✅ NEW: Update approved_at
+    if data.status.lower() == "success":
+        assessment.approved_at = datetime.utcnow()
+    else:
+        assessment.approved_at = None  # optional reset
 
     db.commit()
     db.refresh(assessment)
 
-    return {"message": "Status updated"}
-
-
+    return {"message": "Status updated successfully"}
 # =========================================================
 # ✅ NEW METHODS (FOR PATIENT → ASSESSMENT FLOW)
 # =========================================================
@@ -163,7 +169,7 @@ def get_patient_assessments(
 
     query = text("""
         SELECT id, score, severity, status, created_at,
-               insight, recommendation
+               insight, recommendation,approved_at,doctor_notes
         FROM assessments
         WHERE user_id = :uid
         ORDER BY created_at DESC

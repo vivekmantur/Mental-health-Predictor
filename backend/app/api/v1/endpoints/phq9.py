@@ -14,6 +14,13 @@ from app.services.insight_service import generate_insight
 from app.services.recommendation_service import generate_recommendation
 from app.services.embedding_service import DSMEmbeddingService
 
+
+from app.repositories.assessment_repo import (
+    get_last_two_success_assessments,
+    get_latest_success_assessment,
+    get_assessment_history
+)
+
 router = APIRouter()
 
 
@@ -97,9 +104,9 @@ def get_my_assessments(
     user_id = user["user_id"]
 
     query = text("""
-        SELECT id, score, severity, status, created_at,
+        SELECT id, score, severity, status, created_at,approved_at,
             insight, recommendation,
-            category, subcategory, disorder
+            category, subcategory, disorder,doctor_notes
         FROM assessments
         WHERE user_id = :uid
         ORDER BY created_at DESC
@@ -120,7 +127,9 @@ def get_trend_analysis(
         return {
             "message": "Not enough data",
             "insight": None,
-            "recommendation": None
+            "recommendation": None,
+            "category": None,
+            "disorder": None
         }
 
     latest = records[0]
@@ -131,6 +140,85 @@ def get_trend_analysis(
     return {
         "latest_score": latest.score,
         "previous_score": previous.score,
+        "category": latest.category,     # ✅ ADD THIS
+        "disorder": latest.disorder,     # ✅ ADD THIS
         "insight": ai_response["insight"],
         "recommendation": ai_response["recommendation"]
+    }
+    
+    
+@router.get("/dashboard")
+def get_dashboard(
+    db: Session = Depends(get_db),
+    user: dict = Depends(get_current_user)
+):
+    user_id = user["user_id"]
+
+    # ---------------------------------------------------------
+    # ✅ Latest Assessment
+    # ---------------------------------------------------------
+    latest = get_latest_success_assessment(db, user_id)
+
+    if not latest:
+        return {"message": "No assessments found"}
+
+    # ---------------------------------------------------------
+    # ✅ Extract answers (Q1–Q9)
+    # ---------------------------------------------------------
+    answers = [
+        latest.q1, latest.q2, latest.q3,
+        latest.q4, latest.q5, latest.q6,
+        latest.q7, latest.q8, latest.q9
+    ]
+
+    # ---------------------------------------------------------
+    # ✅ Trend (last two)
+    # ---------------------------------------------------------
+    last_two = get_last_two_success_assessments(db, user_id)
+
+    trend_data = {
+        "latest_score": latest.score,
+        "previous_score": None,
+        "insight": None,
+        "recommendation": None,
+        "history": []
+    }
+
+    if len(last_two) >= 2:
+        trend_ai = generate_trend_analysis(last_two[0], last_two[1])
+
+        trend_data.update({
+            "previous_score": last_two[1].score,
+            "insight": trend_ai.get("insight"),
+            "recommendation": trend_ai.get("recommendation")
+        })
+
+    # ---------------------------------------------------------
+    # ✅ History for chart
+    # ---------------------------------------------------------
+    history = get_assessment_history(db, user_id)
+
+    trend_data["history"] = [
+        {
+            "date": record.created_at.strftime("%b %d"),
+            "score": record.score
+        }
+        for record in history
+    ]
+
+    # ---------------------------------------------------------
+    # ✅ Final Response
+    # ---------------------------------------------------------
+    return {
+        "latest": {
+            "score": latest.score,
+            "severity": latest.severity,
+            "answers": answers,
+            "category": latest.category,
+            "subcategory": latest.subcategory,
+            "disorder": latest.disorder,
+            "insight": latest.insight,
+            "recommendation": latest.recommendation
+        },
+        "trend": trend_data
     }
